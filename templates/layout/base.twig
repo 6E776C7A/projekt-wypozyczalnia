@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Leasing Pro - Nowoczesny leasing samochodów{% endblock %}</title>
+    {# Tutaj linki do CSS, np. Bootstrap, TailwindCSS lub własne style #}
+    <link rel="stylesheet" href="/css/style.css">
+    {% block stylesheets %}{% endblock %}
+</head>
+<body>
+    {# Dołączamy reużywalny nagłówek #}
+    {% include 'partials/shared/_header.twig' %}
+
+    <main>
+        {# Dołączamy komponent do powiadomień (np. "Wniosek wysłany!") #}
+        {% include 'partials/shared/_alerts.twig' %}
+        
+        {# Główna treść strony będzie wstrzykiwana tutaj #}
+        {% block content %}{% endblock %}
+    </main>
+
+    {# Dołączamy reużywalną stopkę #}
+    {% include 'partials/shared/_footer.twig' %}
+
+    {# Tutaj skrypty JS #}
+    <script src="/js/main.js"></script>
+    {% block javascripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,39 @@
+{% extends 'layouts/base.twig' %}
+
+{% block title %}Strona główna | {{ parent() }}{% endblock %}
+
+{% block content %}
+    {# Sekcja "Hero" z głównym hasłem i wyszukiwarką #}
+    <section class="hero-section text-center py-5">
+        <h1>Samochód w abonamencie lub leasingu. Prościej się nie da.</h1>
+        <p class="lead">Wybierz auto, dopasuj ratę i odbierz kluczyki.</p>
+        <div class="container mt-4">
+            {# Dołączamy komponent wyszukiwarki/filtrów #}
+            {% include 'partials/offer/_filters.twig' %}
+        </div>
+    </section>
+
+    {# Sekcja z polecanymi ofertami #}
+    <section class="featured-offers py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-4">Sprawdź nasze najlepsze oferty</h2>
+            <div class="row">
+                {# Pętla po ofertach przekazanych z kontrolera (np. PHP/Symfony) #}
+                {% for car in featured_cars %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        {# Dołączamy kartę oferty, przekazując do niej zmienną 'car' #}
+                        {% include 'partials/offer/_card.twig' with { car: car } %}
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="text-center mt-3">
+                <a href="{{ path('offer_list') }}" class="btn btn-primary btn-lg">Zobacz wszystkie pojazdy</a>
+            </div>
+        </div>
+    </section>
+
+    {# Sekcja "Jak to działa?" #}
+    <section class="how-it-works-section py-5">
+        {# ... treść wyjaśniająca proces w 3-4 krokach ... #}
+    </section>
+{% endblock %}
