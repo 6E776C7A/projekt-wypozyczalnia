@@ -1,6 +1,7 @@
 
 /vendor/
 node_modules/
+data/*.sqlite
 
 
 .DS_Store
