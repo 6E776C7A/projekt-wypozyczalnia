@@ -54,3 +54,6 @@ Posiadanie zainstalowanego DockerDesktop.
     # docker-compose restart (restartuje kontener)
 
     # docekr-compose up -d (startuje kontener)
+  12. Strona dostępna jest pod adresem:
+  
+    # localhost:8080
