@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Potwierdzenie rezerwacji</title>
+    <style>
+        body { font-family: sans-serif; color: #333; }
+        .container { padding: 20px; border: 1px solid #ddd; max-width: 600px; margin: auto; }
+        .header { font-size: 24px; color: #007bff; }
+        .details-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .details-table td { padding: 8px; border: 1px solid #eee; }
+        .details-table td:first-child { font-weight: bold; }
+        .cancel-link { display: inline-block; margin-top: 20px; padding: 10px 15px; background-color: #dc3545; color: white; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="header">Dziękujemy za rezerwację!</h1>
+        <p>Twoja rezerwacja została pomyślnie złożona. Poniżej znajdują się jej szczegóły:</p>
+
+        <table class="details-table">
+            <tr>
+                <td>Samochód:</td>
+                <td>{{ details.marka }} {{ details.model }}</td>
+            </tr>
+            <tr>
+                <td>Data odbioru:</td>
+                <td>{{ details.dateFrom }}</td>
+            </tr>
+            <tr>
+                <td>Data zwrotu:</td>
+                <td>{{ details.dateTo }}</td>
+            </tr>
+            <tr>
+                <td>Całkowity koszt:</td>
+                <td>{{ details.totalCost }} PLN</td>
+            </tr>
+        </table>
+
+        <p>Jeśli chcesz anulować rezerwację, kliknij poniższy link:</p>
+        <a href="{{ details.cancelLink }}" class="cancel-link">Anuluj rezerwację</a>
+        <p style="font-size: 12px; color: #777;">Pamiętaj, że rezerwację można anulować bezpłatnie na 48 godzin przed datą odbioru.</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{% extends "base.twig" %}
+
+{% block content %}
+    {# Sprawdzamy zmienną 'success' przekazaną z kontrolera #}
+    {% if success %}
+        {# Blok wyświetlany w przypadku pomyślnego anulowania #}
+        <div class="status-message success">
+            <div class="status-icon">
+                ✔ {# Znak "ptaszka" #}
+            </div>
+            <h2>Rezerwacja Anulowana</h2>
+            <p>{{ message }}</p>
+        </div>
+    {% else %}
+        {# Blok wyświetlany w przypadku błędu #}
+        <div class="status-message error">
+            <div class="status-icon">
+                ✖ {# Znak "krzyżyka" #}
+            </div>
+            <h2>Błąd Anulowania</h2>
+            <p>{{ message }}</p>
+        </div>
+    {% endif %}
+
+    <a href="/" class="button-link">Wróć na stronę główną</a>
+{% endblock %}
