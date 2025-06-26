@@ -39,18 +39,18 @@ Posiadanie zainstalowanego DockerDesktop.
 
     # docker-compose down (wyłączenie kontenera oraz go wyczyszczenie, należy następnym razem wykonać pkt nr.1)
 
-  9. !!! Baza danych nie jest wysyłana na gita tylko jest LOKALNIE !!!
+  ## 9. !!! Baza danych nie jest wysyłana na gita tylko jest LOKALNIE !!!
 
   10. Po dodaniu dodatkowych plików w VSC gdy kontener jest włączony należy wykonać:
 
-      # docker-compose up -d (Aktualizacja plików kontenera)
+    # docker-compose up -d (Aktualizacja plików kontenera)
 
   11. Przydatne komendy Docker:
 
-      # docker -ps (Lista działających kontenerów)
+    # docker -ps (Lista działających kontenerów)
 
-      # docker-compose stop (zatrzymuje kontener nie czyszcząc go)
+    # docker-compose stop (zatrzymuje kontener nie czyszcząc go)
 
-      # docker-compose restart (restartuje kontener)
+    # docker-compose restart (restartuje kontener)
 
-      # docekr-compose up -d (startuje kontener)
+    # docekr-compose up -d (startuje kontener)
