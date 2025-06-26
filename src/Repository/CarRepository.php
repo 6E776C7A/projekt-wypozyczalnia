@@ -1,48 +1,66 @@
-// W klasie CarRepository
-public function findAvailableCars(string $dateFrom, string $dateTo, array $filters) {
-    // ... połączenie z bazą danych (np. PDO) ...
+<?php
+// Plik: src/Repository/CarRepository.php
 
-    $sql = "SELECT * FROM samochody s
-            WHERE s.id NOT IN (
-                SELECT r.samochod_id FROM rezerwacje r
-                WHERE (r.data_od <= :date_to) AND (r.data_do >= :date_from)
-            )";
+namespace App\Repository;
 
-    // Dodawanie filtrów (skrzynia, miejsca, kategoria) do zapytania SQL
-    if (!empty($filters['skrzynia_biegow'])) {
-        $sql .= " AND s.skrzynia_biegow = :skrzynia";
+use PDO;
+
+class CarRepository
+{
+    private PDO $pdo;
+
+    public function __construct(PDO $pdo)
+    {
+        $this->pdo = $pdo;
     }
-    // ... podobnie dla innych filtrów ...
 
-    // Dodawanie sortowania
-    // ...
-
-    $stmt = $this->pdo->prepare($sql);
-    $stmt->execute(['date_from' => $dateFrom, 'date_to' => $dateTo, /* ...parametry filtrów... */]);
-    return $stmt->fetchAll();
-}
-```**Ważne:** Warunek `(r.data_od <= :date_to) AND (r.data_do >= :date_from)` poprawnie wykrywa każdą, nawet jednodniową, kolizję terminów.
-
-**Obliczanie ceny (`BookingService.php`)**
-Ta funkcja iteruje po dniach w wybranym okresie i sumuje koszt.
-
-```php
-// W klasie BookingService
-public function calculatePrice(string $dateFrom, string $dateTo, float $priceWeekday, float $priceWeekend): float {
-    $period = new DatePeriod(
-        new DateTime($dateFrom),
-        new DateInterval('P1D'),
-        (new DateTime($dateTo))->modify('+1 day') // Uwzględniamy ostatni dzień
-    );
-
-    $totalPrice = 0;
-    foreach ($period as $date) {
-        $dayOfWeek = $date->format('N'); // 1 (pon) to 7 (niedz)
-        if ($dayOfWeek >= 6) { // Sobota lub Niedziela
-            $totalPrice += $priceWeekend;
-        } else {
-            $totalPrice += $priceWeekday;
-        }
+    public function findById(int $id): ?array
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM samochody WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+        $result = $stmt->fetch();
+        return $result ?: null;
     }
-    return $totalPrice;
+
+    public function findAvailableCars(string $dateFrom, string $dateTo, array $filters = []): array
+    {
+        $sql = "SELECT * FROM samochody s
+                WHERE s.id NOT IN (
+                    SELECT r.samochod_id FROM rezerwacje r
+                    WHERE (r.data_od < :date_to) AND (r.data_do > :date_from)
+                )";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':date_from' => $dateFrom, ':date_to' => $dateTo]);
+        return $stmt->fetchAll();
+    }
+
+    public function saveBooking(int $carId, string $email, string $dateFrom, string $dateTo, float $totalCost, string $token): bool
+    {
+        $sql = "INSERT INTO rezerwacje (samochod_id, email_klienta, data_od, data_do, calkowity_koszt, token_anulowania)
+                VALUES (:car_id, :email, :date_from, :date_to, :cost, :token)";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([
+            ':car_id' => $carId,
+            ':email' => $email,
+            ':date_from' => $dateFrom,
+            ':date_to' => $dateTo,
+            ':cost' => $totalCost,
+            ':token' => $token
+        ]);
+    }
+
+    public function findBookingByToken(string $token): ?array
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM rezerwacje WHERE token_anulowania = :token");
+        $stmt->execute([':token' => $token]);
+        $result = $stmt->fetch();
+        return $result ?: null;
+    }
+
+    public function deleteBookingById(int $id): bool
+    {
+        $stmt = $this->pdo->prepare("DELETE FROM rezerwacje WHERE id = :id");
+        return $stmt->execute([':id' => $id]);
+    }
 }
