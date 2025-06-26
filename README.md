@@ -39,7 +39,7 @@ Posiadanie zainstalowanego DockerDesktop.
 
     # docker-compose down (wyłączenie kontenera oraz go wyczyszczenie, należy następnym razem wykonać pkt nr.1)
 
-  ## 9. !!! Baza danych nie jest wysyłana na gita tylko jest LOKALNIE !!!
+  9. !!! Baza danych nie jest wysyłana na gita tylko jest LOKALNIE !!!
 
   10. Po dodaniu dodatkowych plików w VSC gdy kontener jest włączony należy wykonać:
 
