@@ -4,12 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Leasing Pro - Nowoczesny leasing samochodów{% endblock %}</title>
-    {# Tutaj linki do CSS, np. Bootstrap, TailwindCSS lub własne style #}
-    <link rel="stylesheet" href="/css/style.css">
+    
+    {# --- POPRAWKA TUTAJ --- #}
+    {# Usunięto ukośnik (/) na początku ścieżki. #}
+    {# Zamiast href="/css/style.css" jest teraz href="css/style.css" #}
+    <link rel="stylesheet" href="css/style.css">
+
     {% block stylesheets %}{% endblock %}
 </head>
 <body>
-    {# Dołączamy reużywalny nagłówek #}
+    {# Dołączamy reużywalny nagłówek. Pamiętaj, że w tym pliku też trzeba poprawić linki! #}
     {% include 'partials/shared/_header.twig' %}
 
     <main>
@@ -23,8 +27,11 @@
     {# Dołączamy reużywalną stopkę #}
     {% include 'partials/shared/_footer.twig' %}
 
-    {# Tutaj skrypty JS #}
-    <script src="/js/main.js"></script>
+    {# --- I POPRAWKA TUTAJ --- #}
+    {# Usunięto ukośnik (/) na początku ścieżki. #}
+    {# Zamiast src="/js/main.js" jest teraz src="js/main.js" #}
+    <script src="js/main.js"></script>
+    
     {% block javascripts %}{% endblock %}
 </body>
 </html>

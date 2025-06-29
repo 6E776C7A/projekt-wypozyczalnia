@@ -1,16 +1,22 @@
 <?php
 
-// Krok 1: Automatyczne ładowanie klas (dzięki Composer)
-require_once 'vendor/autoload.php';
+// Włączamy wyświetlanie błędów na czas dewelopmentu
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// Krok 1: Automatyczne ładowanie klas (Composer)
+require_once __DIR__ . '/../vendor/autoload.php';
 
 // Krok 2: Podstawowa konfiguracja aplikacji
-define('DB_PATH', __DIR__ . 'data/mydb.sqlite'); // Zmień na poprawną nazwę pliku
-define('TEMPLATE_PATH', __DIR__ . '/templates');
+define('DB_PATH', __DIR__ . '/../data/mydb.sqlite');
+define('TEMPLATE_PATH', __DIR__ . '/../templates');
 
 // Krok 3: Inicjalizacja Twiga (systemu szablonów)
 $loader = new \Twig\Loader\FilesystemLoader(TEMPLATE_PATH);
 $twig = new \Twig\Environment($loader, [
-    // 'cache' => __DIR__ . '/cache', // Opcjonalnie, włącz dla lepszej wydajności
+    // Opcjonalnie: włącz auto-odświeżanie szablonów podczas dewelopmentu
+    'auto_reload' => true
 ]);
 
 // Krok 4: Inicjalizacja połączenia z bazą danych (PDO)
@@ -21,83 +27,61 @@ try {
     die("Błąd krytyczny: Nie można połączyć się z bazą danych. " . $e->getMessage());
 }
 
-// Krok 5: Prosty router - analiza adresu URL
+// Krok 5: NOWY, LEPSZY ROUTER (obsługa "ładnych adresów")
 $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$requestMethod = $_SERVER['REQUEST_METHOD'];
 
 switch ($requestUri) {
     // --- TRASA: Strona główna ---
+    // Adres: http://localhost:8080/
     case '/':
-        // Pobierz wszystkie samochody z bazy, aby je wyświetlić
         $stmt = $pdo->query("SELECT * FROM cars ORDER BY id DESC");
         $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        // Wyrenderuj szablon strony głównej, przekazując dane o samochodach
-        echo $twig->render('pages/home.twig', [
-            'featured_cars' => $cars
-        ]);
+        echo $twig->render('pages/home.twig', ['cars' => $cars]);
         break;
 
-    // --- TRASA: Strona dodawania samochodu ---
-    case '/admin/add-car':
-        // Sprawdzamy, czy formularz został wysłany (metoda POST)
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            
-            // --- LOGIKA ZAPISU DO BAZY ---
-            try {
-                // Zbierz dane z formularza
-                $name = $_POST['name'] ?? '';
-                // ... zbierz pozostałe pola tak jak w poprzedniej odpowiedzi ...
-                $year = (int)($_POST['year'] ?? 0);
-                $mileage = (int)($_POST['mileage'] ?? 0);
-                $fuel_type = $_POST['fuel_type'] ?? '';
-                $engine_size = (int)($_POST['engine_size'] ?? 0);
-                $monthly_rate = (int)($_POST['monthly_rate'] ?? 0);
-                $down_payment = (int)($_POST['down_payment'] ?? 0);
-                $image_url = $_POST['image_url'] ?? '';
-                $description = $_POST['description'] ?? '';
-
-                $sql = "INSERT INTO cars (name, year, mileage, fuel_type, engine_size, monthly_rate, down_payment, image_url, description) 
-                        VALUES (:name, :year, :mileage, :fuel_type, :engine_size, :monthly_rate, :down_payment, :image_url, :description)";
-
-                $stmt = $pdo->prepare($sql);
-                
-                // Bindowanie parametrów dla bezpieczeństwa
-                $stmt->execute([
-                    ':name' => $name,
-                    ':year' => $year,
-                    ':mileage' => $mileage,
-                    ':fuel_type' => $fuel_type,
-                    ':engine_size' => $engine_size,
-                    ':monthly_rate' => $monthly_rate,
-                    ':down_payment' => $down_payment,
-                    ':image_url' => $image_url,
-                    ':description' => $description
-                ]);
-                
-                // Przekieruj z powrotem do formularza z komunikatem o sukcesie
-                header('Location: /admin/add-car?status=success');
-                exit();
-
-            } catch (PDOException $e) {
-                // W przypadku błędu, wyświetl formularz ponownie z komunikatem o błędzie
-                echo $twig->render('pages/admin/add_car.twig', [
-                    'error' => 'Wystąpił błąd podczas zapisu: ' . $e->getMessage()
-                ]);
-            }
-
+    // --- TRASA: Panel Administratora ---
+    // Adres: http://localhost:8080/admin
+    case '/admin':
+        if ($requestMethod === 'POST') {
+            // Tutaj logika dodawania nowego samochodu
+            // ...
+            // PRZEKIEROWANIE na ładny URL
+            header('Location: /admin?status=added');
+            exit();
         } else {
-            // --- WYŚWIETLANIE PUSTEGO FORMULARZA ---
-            // Jeśli metoda to GET, po prostu renderujemy szablon formularza
-            echo $twig->render('pages/admin/add_car.twig', [
-                // Możesz przekazać status z URL, aby wyświetlić komunikat o sukcesie
-                'success' => ($_GET['status'] ?? '') === 'success'
+            // Pobierz samochody do wyświetlenia w panelu
+            $stmt = $pdo->query("SELECT * FROM cars ORDER BY id DESC");
+            $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            echo $twig->render('pages/admin/dashboard.twig', [
+                'cars' => $cars,
+                'status' => $_GET['status'] ?? null // $_GET wciąż działa dla parametrów!
             ]);
         }
         break;
 
+    // --- TRASA: Akcja usuwania samochodu ---
+    // Adres: http://localhost:8080/delete (np. z formularza metodą POST)
+    case '/delete':
+        if ($requestMethod === 'POST') {
+            // Pobierz ID z formularza
+            $idToDelete = $_POST['id'] ?? null;
+            if ($idToDelete) {
+                $stmt = $pdo->prepare("DELETE FROM cars WHERE id = ?");
+                $stmt->execute([$idToDelete]);
+            }
+            // PRZEKIEROWANIE na ładny URL
+            header('Location: /admin?status=deleted');
+            exit();
+        }
+        // Jeśli ktoś wejdzie na /delete metodą GET, przekieruj go
+        header('Location: /admin');
+        exit();
+
     // --- Domyślna trasa, gdy strona nie istnieje ---
     default:
-        header("HTTP/1.0 404 Not Found");
-        echo $twig->render('pages/static/404.twig'); // Potrzebujesz stworzyć plik 404.twig
+        header("HTTP/1.1 404 Not Found");
+        echo $twig->render('pages/static/404.twig');
         break;
 }

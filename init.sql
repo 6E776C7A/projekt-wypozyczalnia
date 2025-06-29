@@ -1,23 +1,23 @@
-CREATE TABLE samochody (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    marka VARCHAR(100) NOT NULL,
-    model VARCHAR(100) NOT NULL,
-    kategoria VARCHAR(50) NOT NULL,
-    skrzynia_biegow VARCHAR(20) NOT NULL CHECK(skrzynia_biegow IN ('Automatyczna', 'Manualna')),
-    liczba_miejsc INT NOT NULL,
-    cena_dzien_roboczy DECIMAL(10, 2) NOT NULL,
-    cena_dzien_weekend DECIMAL(10, 2) NOT NULL,
-    zdjecie_url VARCHAR(255)
+CREATE TABLE cars (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    make TEXT NOT NULL,
+    model TEXT NOT NULL,
+    category TEXT NOT NULL,
+    transmission TEXT NOT NULL CHECK(transmission IN ('Automatic', 'Manual')),
+    seats INTEGER NOT NULL,
+    workday_price REAL NOT NULL,
+    weekend_price REAL NOT NULL,
+    image_url TEXT
 );
 
-CREATE TABLE rezerwacje (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    samochod_id INT NOT NULL,
-    data_od DATE NOT NULL,
-    data_do DATE NOT NULL,
-    email_klienta VARCHAR(255) NOT NULL,
-    calkowity_koszt DECIMAL(10, 2) NOT NULL,
-    token_anulowania VARCHAR(255) NOT NULL UNIQUE,
-    data_utworzenia TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (samochod_id) REFERENCES samochody(id)
+CREATE TABLE reservations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    car_id INTEGER NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    customer_email TEXT NOT NULL,
+    total_cost REAL NOT NULL,
+    cancellation_token TEXT NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (car_id) REFERENCES cars(id)
 );

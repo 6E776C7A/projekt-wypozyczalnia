@@ -1,0 +1,95 @@
+{# Plik: templates/pages/admin/dashboard.twig #}
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}Panel Administratora - Leasing Pro{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Panel Administratora</h1>
+
+    {# Formularz dodawania nowego samochodu - teraz kompletny #}
+    <h2>Dodaj nowy samochód</h2>
+    
+    <form action="index.php?page=admin" method="POST" class="car-form">
+        <div>
+            <label for="make">Marka:</label>
+            <input type="text" id="make" name="make" required>
+        </div>
+        <div>
+            <label for="model">Model:</label>
+            <input type="text" id="model" name="model" required>
+        </div>
+        <div>
+            <label for="category">Kategoria:</label>
+            <select id="category" name="category">
+                <option value="Osobowy" selected>Osobowy</option>
+                <option value="SUV">SUV</option>
+                <option value="Dostawczy">Dostawczy</option>
+                <option value="Sportowy">Sportowy</option>
+            </select>
+        </div>
+        <div>
+            <label for="transmission">Skrzynia biegów:</label>
+            <select id="transmission" name="transmission">
+                <option value="Manual" selected>Manualna</option>
+                <option value="Automatic">Automatyczna</option>
+            </select>
+        </div>
+        <div>
+            <label for="seats">Liczba miejsc:</label>
+            <input type="number" id="seats" name="seats" min="1" value="5" required>
+        </div>
+        <div>
+            <label for="workday_price">Cena (dzień roboczy):</label>
+            <input type="number" id="workday_price" name="workday_price" step="0.01" min="0" required>
+        </div>
+        <div>
+            <label for="weekend_price">Cena (weekend):</label>
+            <input type="number" id="weekend_price" name="weekend_price" step="0.01" min="0" required>
+        </div>
+        <div>
+            <label for="image_url">URL do zdjęcia:</label>
+            <input type="url" id="image_url" name="image_url" placeholder="https://example.com/car.jpg">
+        </div>
+        
+        <button type="submit">Dodaj samochód</button>
+    </form>
+
+    <hr>
+
+    {# Tabela z listą istniejących samochodów - bez zmian, jest poprawna #}
+    <h2>Zarządzaj samochodami</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Marka</th>
+                <th>Model</th>
+                <th>Cena (dzień/weekend)</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for car in cars %}
+            <tr>
+                <td>{{ car.id }}</td>
+                <td>{{ car.make }}</td>
+                <td>{{ car.model }}</td>
+                <td>{{ car.workday_price|number_format(2, ',', ' ') }} zł / {{ car.weekend_price|number_format(2, ',', ' ') }} zł</td>
+                <td>
+                    {# Formularz do usuwania samochodu - jest poprawny #}
+                    <form action="index.php?page=delete" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć ten samochód?');">
+                        <input type="hidden" name="car_id" value="{{ car.id }}">
+                        <button type="submit" class="button-delete">Usuń</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5">Brak samochodów w bazie danych.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
