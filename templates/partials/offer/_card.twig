@@ -1,0 +1,35 @@
+<div class="car-card" style="background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden; transition: transform 0.2s;">
+    {% if car.image_url %}
+        <img src="{{ car.image_url }}" alt="{{ car.make }} {{ car.model }}" style="width: 100%; height: 200px; object-fit: cover;">
+    {% else %}
+        <div style="width: 100%; height: 200px; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+            Brak zdjęcia
+        </div>
+    {% endif %}
+    
+    <div style="padding: 1.5rem;">
+        <h3 style="margin: 0 0 0.5rem 0; font-size: 1.25rem;">{{ car.make }} {{ car.model }}</h3>
+        
+        <div style="margin-bottom: 1rem;">
+            <span style="background-color: #e9ecef; padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.875rem; margin-right: 0.5rem;">{{ car.category }}</span>
+            <span style="background-color: #e9ecef; padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.875rem;">{{ car.transmission }}</span>
+        </div>
+        
+        <div style="margin-bottom: 1rem;">
+            <p style="margin: 0; color: #6c757d; font-size: 0.875rem;">{{ car.seats }} miejsc</p>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <div>
+                <p style="margin: 0; font-size: 0.875rem; color: #6c757d;">Dzień roboczy</p>
+                <p style="margin: 0; font-weight: bold; color: #28a745;">{{ car.workday_price|number_format(2, ',', ' ') }} zł</p>
+            </div>
+            <div>
+                <p style="margin: 0; font-size: 0.875rem; color: #6c757d;">Weekend</p>
+                <p style="margin: 0; font-weight: bold; color: #007bff;">{{ car.weekend_price|number_format(2, ',', ' ') }} zł</p>
+            </div>
+        </div>
+        
+        <a href="/offers/{{ car.id }}" style="display: block; text-align: center; background-color: #007bff; color: white; text-decoration: none; padding: 0.75rem; border-radius: 5px; transition: background-color 0.2s;">Zobacz szczegóły</a>
+    </div>
+</div>

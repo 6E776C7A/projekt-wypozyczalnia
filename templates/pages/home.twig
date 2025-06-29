@@ -3,37 +3,69 @@
 {% block title %}Strona główna | {{ parent() }}{% endblock %}
 
 {% block content %}
-    {# Sekcja "Hero" z głównym hasłem i wyszukiwarką #}
-    <section class="hero-section text-center py-5">
-        <h1>Samochód w abonamencie lub leasingu. Prościej się nie da.</h1>
-        <p class="lead">Wybierz auto, dopasuj ratę i odbierz kluczyki.</p>
-        <div class="container mt-4">
-            {# Dołączamy komponent wyszukiwarki/filtrów #}
-            {% include 'partials/offer/_filters.twig' %}
-        </div>
-    </section>
-
-    {# Sekcja z polecanymi ofertami #}
-    <section class="featured-offers py-5 bg-light">
-        <div class="container">
-            <h2 class="text-center mb-4">Sprawdź nasze najlepsze oferty</h2>
-            <div class="row">
-                {# Pętla po ofertach przekazanych z kontrolera (np. PHP/Symfony) #}
-                {% for car in featured_cars %}
-                    <div class="col-md-6 col-lg-4 mb-4">
-                        {# Dołączamy kartę oferty, przekazując do niej zmienną 'car' #}
-                        {% include 'partials/offer/_card.twig' with { car: car } %}
+    {% if not captcha_verified %}
+        {# Formularz reCAPTCHA v2 - gdy użytkownik nie przeszedł weryfikacji #}
+        <div class="captcha-container">
+            <div class="captcha-form">
+                <h1>Weryfikacja bezpieczeństwa</h1>
+                <p>Przed przejściem do strony głównej, prosimy o weryfikację, że nie jesteś robotem.</p>
+                
+                {% if captcha_error %}
+                    <div class="captcha-error">
+                        {{ captcha_error }}
                     </div>
-                {% endfor %}
-            </div>
-            <div class="text-center mt-3">
-                <a href="/offers" class="btn btn-primary btn-lg">Zobacz wszystkie pojazdy</a>
+                {% endif %}
+                
+                <form method="POST" action="/">
+                    <div id="g-recaptcha" class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"></div>
+                    <button type="submit" class="captcha-button">Przejdź do strony głównej</button>
+                </form>
+                
+                <div style="text-align: center; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #eee;">
+                    <a href="/" style="color: #007bff; text-decoration: none;">← Wróć do strony głównej</a>
+                </div>
             </div>
         </div>
-    </section>
+    {% else %}
+        {# Treść strony głównej - gdy użytkownik przeszedł weryfikację #}
+        {# Sekcja "Hero" z głównym hasłem i wyszukiwarką #}
+        <section class="hero-section text-center py-5">
+            <h1>Samochód w abonamencie lub leasingu. Prościej się nie da.</h1>
+            <p class="lead">Wybierz auto, dopasuj ratę i odbierz kluczyki.</p>
+            <div class="container mt-4">
+                {# Dołączamy komponent wyszukiwarki/filtrów #}
+                {% include 'partials/offer/_filters.twig' %}
+            </div>
+        </section>
 
-    {# Sekcja "Jak to działa?" #}
-    <section class="how-it-works-section py-5">
-        {# ... treść wyjaśniająca proces w 3-4 krokach ... #}
-    </section>
+        {# Sekcja z polecanymi ofertami #}
+        <section class="featured-offers py-5 bg-light">
+            <div class="container">
+                <h2 class="text-center mb-4">Sprawdź nasze najlepsze oferty</h2>
+                <div class="row">
+                    {# Pętla po ofertach przekazanych z kontrolera (np. PHP/Symfony) #}
+                    {% for car in featured_cars %}
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            {# Dołączamy kartę oferty, przekazując do niej zmienną 'car' #}
+                            {% include 'partials/offer/_card.twig' with { car: car } %}
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="text-center mt-3">
+                    <a href="/offers" class="btn btn-primary btn-lg">Zobacz wszystkie pojazdy</a>
+                </div>
+            </div>
+        </section>
+
+        {# Sekcja "Jak to działa?" #}
+        <section class="how-it-works-section py-5">
+            {# ... treść wyjaśniająca proces w 3-4 krokach ... #}
+        </section>
+    {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+    {% if not captcha_verified %}
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    {% endif %}
 {% endblock %}
