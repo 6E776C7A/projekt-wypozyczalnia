@@ -120,7 +120,7 @@ switch ($requestUri) {
             if (verifyRecaptcha($recaptchaResponse)) {
                 // reCAPTCHA przeszła weryfikację
                 $_SESSION['captcha_verified'] = true;
-                header('Location: /');
+                header('Location: /offers');
                 exit();
             } else {
                 // reCAPTCHA nie przeszła weryfikacji
@@ -136,13 +136,9 @@ switch ($requestUri) {
             $captchaVerified = $_SESSION['captcha_verified'] ?? false;
             
             if ($captchaVerified) {
-                // Użytkownik przeszedł weryfikację - pokaż treść
-                $stmt = $pdo->query("SELECT * FROM cars ORDER BY id DESC");
-                $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                echo $twig->render('pages/home.twig', [
-                    'featured_cars' => $cars,
-                    'captcha_verified' => true
-                ]);
+                // Użytkownik przeszedł weryfikację - pokaż listę ofert
+                header('Location: /offers');
+                exit();
             } else {
                 // Użytkownik nie przeszedł weryfikacji - pokaż reCAPTCHA
                 echo $twig->render('pages/home.twig', [
@@ -234,6 +230,48 @@ switch ($requestUri) {
                 ]);
             }
         }
+        break;
+
+    // --- TRASA: Lista ofert / wyszukiwanie ---
+    // Adres: http://localhost:8080/offers
+    case '/offers':
+        // Odczyt filtrów z query string
+        $category = $_GET['category'] ?? '';
+        $transmission = $_GET['transmission'] ?? '';
+        $maxPrice = $_GET['max_price'] ?? '';
+
+        // Budowa zapytania z warunkami opcjonalnymi
+        $sql = "SELECT * FROM cars WHERE 1=1";
+        $params = [];
+
+        if ($category !== '') {
+            $sql .= " AND category = :category";
+            $params[':category'] = $category;
+        }
+        if ($transmission !== '') {
+            $sql .= " AND transmission = :transmission";
+            $params[':transmission'] = $transmission;
+        }
+        if ($maxPrice !== '' && is_numeric($maxPrice)) {
+            // Filtrujemy po tańszej z cen (dzień roboczy) – można rozszerzyć zgodnie z wymaganiami
+            $sql .= " AND workday_price <= :max_price";
+            $params[':max_price'] = (float)$maxPrice;
+        }
+
+        $sql .= " ORDER BY id DESC";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        echo $twig->render('pages/offer/list.twig', [
+            'cars' => $cars,
+            'filters' => [
+                'category' => $category,
+                'transmission' => $transmission,
+                'max_price' => $maxPrice
+            ]
+        ]);
         break;
 
     // --- TRASA: Akcja usuwania samochodu ---

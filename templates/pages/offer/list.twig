@@ -1,0 +1,49 @@
+{% extends 'layouts/base.twig' %}
+
+{% block title %}Wszystkie pojazdy | {{ parent() }}{% endblock %}
+
+{% block content %}
+    <section class="offers-list py-5">
+        <div class="container">
+            <h1 class="text-center mb-4">Wszystkie pojazdy</h1>
+
+            {# Filtry wyszukiwania #}
+            <div class="mb-4">
+                {% include 'partials/offer/_filters.twig' %}
+            </div>
+
+            {# Aktywne filtry + przycisk do anulowania #}
+            {% set f = filters|default({}) %}
+            {% set hasFilters = (f.category is defined and f.category) or (f.transmission is defined and f.transmission) or (f.max_price is defined and f.max_price) %}
+            {% if hasFilters %}
+                <div class="mb-4" style="background: #f8f9fa; padding: 1rem; border-radius: 8px; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                    <strong>Aktywne filtry:</strong>
+                    {% if f.category %}
+                        <span style="background:#e9ecef; padding: 0.25rem 0.5rem; border-radius: 4px;">Kategoria: {{ f.category }}</span>
+                    {% endif %}
+                    {% if f.transmission %}
+                        <span style="background:#e9ecef; padding: 0.25rem 0.5rem; border-radius: 4px;">Skrzynia: {{ f.transmission }}</span>
+                    {% endif %}
+                    {% if f.max_price %}
+                        <span style="background:#e9ecef; padding: 0.25rem 0.5rem; border-radius: 4px;">Max cena: {{ f.max_price }}</span>
+                    {% endif %}
+
+                    <a href="/offers" style="margin-left: auto; padding: 0.5rem 0.75rem; background: #dc3545; color: #fff; text-decoration: none; border-radius: 4px;">Wyczyść filtry</a>
+                </div>
+            {% endif %}
+
+            {# Wyniki #}
+            {% if cars is empty %}
+                <p>Brak wyników dla wybranych filtrów.</p>
+            {% else %}
+                <div class="row">
+                    {% for car in cars %}
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            {% include 'partials/offer/_card.twig' with { car: car } %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}
