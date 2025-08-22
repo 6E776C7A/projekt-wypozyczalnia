@@ -121,6 +121,46 @@
                 {% endfor %}
             </tbody>
         </table>
+
+        <hr>
+
+        {# Tabela z rezerwacjami #}
+        <h2>Rezerwacje</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Auto</th>
+                    <th>Termin</th>
+                    <th>E-mail</th>
+                    <th>Kwota</th>
+                    <th>Utworzona</th>
+                    <th>Akcje</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in reservations %}
+                <tr>
+                    <td>{{ r.id }}</td>
+                    <td>{{ r.make }} {{ r.model }}</td>
+                    <td>{{ r.start_date }} → {{ r.end_date }}</td>
+                    <td>{{ r.customer_email }}</td>
+                    <td>{{ r.total_cost|number_format(2, ',', ' ') }} zł</td>
+                    <td>{{ r.created_at }}</td>
+                    <td>
+                        <form action="/reservations/delete" method="POST" onsubmit="return confirm('Usunąć tę rezerwację?');">
+                            <input type="hidden" name="id" value="{{ r.id }}">
+                            <button type="submit" class="button-delete">Usuń</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7">Brak rezerwacji.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     {% endif %}
 </div>
 {% endblock %}

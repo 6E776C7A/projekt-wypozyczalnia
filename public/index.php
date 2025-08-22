@@ -132,6 +132,106 @@ try {
 $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 
+// Dynamiczne trasy dla ofert: szczegóły i rezerwacja
+if (preg_match('#^/offers/(\d+)$#', $requestUri, $matches)) {
+    $carId = (int)$matches[1];
+
+    // Pobierz auto
+    $stmt = $pdo->prepare("SELECT * FROM cars WHERE id = ?");
+    $stmt->execute([$carId]);
+    $car = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$car) {
+        header("HTTP/1.1 404 Not Found");
+        echo $twig->render('pages/static/404.twig');
+        exit();
+    }
+
+    // Daty z sesji (wymagane do kalkulacji)
+    $dateFrom = $_SESSION['search_dates']['from'] ?? '';
+    $dateTo = $_SESSION['search_dates']['to'] ?? '';
+
+    $totalPrice = null;
+    $isDateRangeValid = false;
+    if ($dateFrom && $dateTo) {
+        $df = date_create($dateFrom);
+        $dt = date_create($dateTo);
+        if ($df && $dt && $dateFrom <= $dateTo) {
+            $isDateRangeValid = true;
+            $totalPrice = calculateTotalRentalCost($dateFrom, $dateTo, (float)$car['workday_price'], (float)$car['weekend_price']);
+        }
+    }
+
+    echo $twig->render('pages/offer/show.twig', [
+        'car' => $car,
+        'dates' => [ 'from' => $dateFrom, 'to' => $dateTo ],
+        'total_price' => $totalPrice,
+        'requireDates' => !$isDateRangeValid,
+        'status' => $_GET['status'] ?? null
+    ]);
+    exit();
+}
+
+if ($requestMethod === 'POST' && preg_match('#^/offers/(\d+)/book$#', $requestUri, $matches)) {
+    $carId = (int)$matches[1];
+
+    // Pobierz auto
+    $stmt = $pdo->prepare("SELECT * FROM cars WHERE id = ?");
+    $stmt->execute([$carId]);
+    $car = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$car) {
+        header("HTTP/1.1 404 Not Found");
+        echo $twig->render('pages/static/404.twig');
+        exit();
+    }
+
+    // Daty z sesji
+    $dateFrom = $_SESSION['search_dates']['from'] ?? '';
+    $dateTo = $_SESSION['search_dates']['to'] ?? '';
+    $df = $dateFrom ? date_create($dateFrom) : null;
+    $dt = $dateTo ? date_create($dateTo) : null;
+    if (!$df || !$dt || $dateFrom > $dateTo) {
+        header('Location: /offers/' . $carId . '?status=invalid_dates');
+        exit();
+    }
+
+    // Sprawdź dostępność (zakresy zamknięte)
+    $stmt = $pdo->prepare("SELECT COUNT(1) FROM reservations WHERE car_id = :car_id AND (start_date <= :date_to) AND (end_date >= :date_from)");
+    $stmt->execute([':car_id' => $carId, ':date_from' => $dateFrom, ':date_to' => $dateTo]);
+    $conflict = (int)$stmt->fetchColumn() > 0;
+    if ($conflict) {
+        header('Location: /offers/' . $carId . '?status=unavailable');
+        exit();
+    }
+
+    // Dane klienta
+    $customerEmail = trim($_POST['email'] ?? '');
+    $firstName = trim($_POST['first_name'] ?? '');
+    $lastName = trim($_POST['last_name'] ?? '');
+
+    if (!filter_var($customerEmail, FILTER_VALIDATE_EMAIL) || $firstName === '' || $lastName === '') {
+        header('Location: /offers/' . $carId . '?status=invalid_form');
+        exit();
+    }
+
+    // Oblicz koszt i zapisz rezerwację
+    $totalCost = calculateTotalRentalCost($dateFrom, $dateTo, (float)$car['workday_price'], (float)$car['weekend_price']);
+    $token = bin2hex(random_bytes(32));
+
+    $stmt = $pdo->prepare("INSERT INTO reservations (car_id, start_date, end_date, customer_email, total_cost, cancellation_token) VALUES (:car_id, :start_date, :end_date, :email, :total_cost, :token)");
+    $stmt->execute([
+        ':car_id' => $carId,
+        ':start_date' => $dateFrom,
+        ':end_date' => $dateTo,
+        ':email' => $customerEmail,
+        ':total_cost' => $totalCost,
+        ':token' => $token
+    ]);
+
+    header('Location: /offers?status=booked');
+    exit();
+}
+
 switch ($requestUri) {
     // --- TRASA: Strona główna ---
     // Adres: http://localhost:8080/
@@ -196,8 +296,13 @@ switch ($requestUri) {
                     $stmt = $pdo->query("SELECT * FROM cars ORDER BY id DESC");
                     $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+                    // Pobierz rezerwacje (z nazwą auta)
+                    $rstmt = $pdo->query("SELECT r.*, c.make, c.model FROM reservations r JOIN cars c ON c.id = r.car_id ORDER BY r.created_at DESC");
+                    $reservations = $rstmt->fetchAll(PDO::FETCH_ASSOC);
+
                     echo $twig->render('pages/admin/dashboard.twig', [
                         'cars' => $cars,
+                        'reservations' => $reservations,
                         'status' => $_GET['status'] ?? null,
                         'username' => $_SESSION['admin_username'] ?? 'Admin',
                         'login_error' => 'Nieprawidłowa nazwa użytkownika lub hasło'
@@ -238,8 +343,13 @@ switch ($requestUri) {
                 $stmt = $pdo->query("SELECT * FROM cars ORDER BY id DESC");
                 $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+                // Pobierz rezerwacje (z nazwą auta)
+                $rstmt = $pdo->query("SELECT r.*, c.make, c.model FROM reservations r JOIN cars c ON c.id = r.car_id ORDER BY r.created_at DESC");
+                $reservations = $rstmt->fetchAll(PDO::FETCH_ASSOC);
+
                 echo $twig->render('pages/admin/dashboard.twig', [
                     'cars' => $cars,
+                    'reservations' => $reservations,
                     'status' => $_GET['status'] ?? null,
                     'username' => $_SESSION['admin_username'] ?? 'Admin'
                 ]);
@@ -247,6 +357,7 @@ switch ($requestUri) {
                 // Użytkownik nie jest zalogowany - pokaż formularz logowania
                 echo $twig->render('pages/admin/dashboard.twig', [
                     'cars' => [],
+                    'reservations' => [],
                     'status' => null,
                     'username' => null,
                     'show_login' => true
@@ -382,7 +493,8 @@ switch ($requestUri) {
             'requireDates' => $requireDates,
             'makes' => $makes,
             'models' => $models,
-            'seatsOptions' => $seatsOptions
+            'seatsOptions' => $seatsOptions,
+            'status' => $_GET['status'] ?? null
         ]);
         break;
 
@@ -403,6 +515,22 @@ switch ($requestUri) {
             exit();
         }
         // Jeśli ktoś wejdzie na /delete metodą GET, przekieruj go
+        header('Location: /admin');
+        exit();
+
+    // --- TRASA: Usuwanie rezerwacji ---
+    // Adres: http://localhost:8080/reservations/delete
+    case '/reservations/delete':
+        requireLogin();
+        if ($requestMethod === 'POST') {
+            $reservationId = $_POST['id'] ?? null;
+            if ($reservationId) {
+                $stmt = $pdo->prepare("DELETE FROM reservations WHERE id = ?");
+                $stmt->execute([$reservationId]);
+            }
+            header('Location: /admin?status=reservation_deleted');
+            exit();
+        }
         header('Location: /admin');
         exit();
 

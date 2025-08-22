@@ -35,6 +35,10 @@
             {# Aktywne filtry + przycisk do anulowania #}
             {% set f = filters|default({}) %}
             {% set hasFilters = (f.category is defined and f.category) or (f.transmission is defined and f.transmission) or (f.max_price is defined and f.max_price) or (f.make is defined and f.make) or (f.model is defined and f.model) or (f.seats is defined and f.seats) or (f.sort is defined and f.sort != 'price_asc') %}
+            {% if status == 'booked' %}
+                <div class="mb-4" style="background:#d4edda; color:#155724; padding:1rem; border-radius:6px;">Rezerwacja przyjęta! Auto nie będzie już widoczne w tym terminie.</div>
+            {% endif %}
+
             {% if hasFilters and not requireDates %}
                 <div class="mb-4" style="background: #f8f9fa; padding: 1rem; border-radius: 8px; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
                     <strong>Aktywne filtry:</strong>

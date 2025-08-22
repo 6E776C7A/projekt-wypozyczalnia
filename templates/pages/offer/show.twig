@@ -1,0 +1,81 @@
+{% extends 'layouts/base.twig' %}
+
+{% block title %}Szczegóły oferty | {{ parent() }}{% endblock %}
+
+{% block content %}
+<section class="offer-detail py-5">
+    <div class="container">
+        <h1 class="mb-4">{{ car.make }} {{ car.model }}</h1>
+
+        {% if status == 'booked' %}
+            <div class="alert alert-success" role="alert" style="background:#d4edda; color:#155724; padding:1rem; border-radius:6px; margin-bottom:1rem;">
+                Rezerwacja przyjęta! Potwierdzenie wysłano na podany e-mail.
+            </div>
+        {% elseif status == 'invalid_form' %}
+            <div class="alert alert-danger" role="alert" style="background:#f8d7da; color:#721c24; padding:1rem; border-radius:6px; margin-bottom:1rem;">
+                Uzupełnij poprawnie dane (imię, nazwisko, e-mail).
+            </div>
+        {% elseif status == 'invalid_dates' %}
+            <div class="alert alert-warning" role="alert" style="background:#fff3cd; color:#856404; padding:1rem; border-radius:6px; margin-bottom:1rem;">
+                Nieprawidłowy zakres dat. Wróć do listy i ustaw termin.
+            </div>
+        {% elseif status == 'unavailable' %}
+            <div class="alert alert-warning" role="alert" style="background:#fff3cd; color:#856404; padding:1rem; border-radius:6px; margin-bottom:1rem;">
+                Niestety w wybranym terminie pojazd jest niedostępny.
+            </div>
+        {% endif %}
+
+        <div class="row">
+            <div class="col-md-6">
+                {% if car.image_url %}
+                    <img src="{{ car.image_url }}" alt="{{ car.make }} {{ car.model }}" style="width:100%; border-radius:8px; object-fit:cover; max-height:360px;">
+                {% else %}
+                    <div style="width:100%; height:360px; background:#f1f3f5; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#6c757d;">Brak zdjęcia</div>
+                {% endif %}
+            </div>
+            <div class="col-md-6">
+                <ul style="list-style:none; padding:0; margin:0 0 1rem 0;">
+                    <li><strong>Kategoria:</strong> {{ car.category }}</li>
+                    <li><strong>Skrzynia biegów:</strong> {{ car.transmission }}</li>
+                    <li><strong>Miejsca:</strong> {{ car.seats }}</li>
+                    <li><strong>Doba (dni robocze):</strong> {{ car.workday_price|number_format(2, ',', ' ') }} zł</li>
+                    <li><strong>Doba (weekend):</strong> {{ car.weekend_price|number_format(2, ',', ' ') }} zł</li>
+                </ul>
+
+                {% if dates.from and dates.to %}
+                    <div style="background:#f8f9fa; padding:1rem; border-radius:8px; margin-bottom:1rem;">
+                        <p style="margin:0 0 .25rem 0;">Termin: <strong>{{ dates.from }}</strong> — <strong>{{ dates.to }}</strong></p>
+                        {% if total_price is not null %}
+                            <p style="margin:0;">Cena za cały termin: <strong>{{ total_price|number_format(2, ',', ' ') }} zł</strong></p>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <div style="background:#fff3cd; color:#856404; padding:1rem; border-radius:8px; margin-bottom:1rem;">
+                        Ustaw najpierw termin wypożyczenia na liście ofert.
+                    </div>
+                {% endif %}
+
+                <h3 class="h5 mb-3">Dane wypożyczającego</h3>
+                <form method="POST" action="/offers/{{ car.id }}/book" style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                    <div style="grid-column: span 1;">
+                        <label for="first_name" style="display:block; margin-bottom:.5rem;">Imię</label>
+                        <input type="text" id="first_name" name="first_name" required style="width:100%; padding:.5rem; border:1px solid #ddd; border-radius:5px;">
+                    </div>
+                    <div style="grid-column: span 1;">
+                        <label for="last_name" style="display:block; margin-bottom:.5rem;">Nazwisko</label>
+                        <input type="text" id="last_name" name="last_name" required style="width:100%; padding:.5rem; border:1px solid #ddd; border-radius:5px;">
+                    </div>
+                    <div style="grid-column: span 2;">
+                        <label for="email" style="display:block; margin-bottom:.5rem;">E-mail</label>
+                        <input type="email" id="email" name="email" required style="width:100%; padding:.5rem; border:1px solid #ddd; border-radius:5px;">
+                    </div>
+                    <div style="grid-column: span 2; display:flex; gap:.75rem;">
+                        <a href="/offers" style="padding:.75rem 1rem; background:#6c757d; color:#fff; text-decoration:none; border-radius:5px;">Wróć</a>
+                        <button type="submit" style="padding:.75rem 1rem; background:#007bff; color:#fff; border:none; border-radius:5px; cursor:pointer;">Zarezerwuj</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

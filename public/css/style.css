@@ -186,10 +186,25 @@ th {
     color: #28a745;
 }
 
+/* Większe odstępy i ujednolicenie siatki dla listy ofert */
+.offers-list .row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2.5rem;
+}
+
+.offers-list .car-card {
+    margin-bottom: 0;
+}
+
 /* Responsywność */
 @media (max-width: 768px) {
     .car-list {
         grid-template-columns: 1fr;
+    }
+    .offers-list .row {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
     }
     
     .container {
