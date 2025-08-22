@@ -7,42 +7,64 @@
         <div class="container">
             <h1 class="text-center mb-4">Wszystkie pojazdy</h1>
 
-            {# Filtry wyszukiwania #}
+            {# Formularz wyboru zakresu dat (wymagany) #}
+            {% set d = dates|default({}) %}
+            <form method="GET" action="/offers" class="mb-4" style="display:flex; gap: 1rem; align-items: end; flex-wrap: wrap;">
+                <div>
+                    <label for="date_from" style="display:block; margin-bottom: .5rem; font-weight: bold;">Data od</label>
+                    <input type="date" id="date_from" name="date_from" value="{{ d.from is defined ? d.from : '' }}" style="padding: .5rem; border: 1px solid #ddd; border-radius: 5px;">
+                </div>
+                <div>
+                    <label for="date_to" style="display:block; margin-bottom: .5rem; font-weight: bold;">Data do</label>
+                    <input type="date" id="date_to" name="date_to" value="{{ d.to is defined ? d.to : '' }}" style="padding: .5rem; border: 1px solid #ddd; border-radius: 5px;">
+                </div>
+                <div>
+                    <button type="submit" style="padding: 0.75rem 1rem; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">Ustaw termin</button>
+                </div>
+            </form>
+
+            {% if requireDates %}
+                <div class="mb-4" style="background:#fff3cd; color:#856404; border:1px solid #ffeeba; padding: 1rem; border-radius: 6px;">Podaj proszę zakres dat, aby zobaczyć dostępne oferty.</div>
+            {% endif %}
+
+            {# Filtry wyszukiwania (poprzedni wygląd) #}
             <div class="mb-4">
                 {% include 'partials/offer/_filters.twig' %}
             </div>
 
             {# Aktywne filtry + przycisk do anulowania #}
             {% set f = filters|default({}) %}
-            {% set hasFilters = (f.category is defined and f.category) or (f.transmission is defined and f.transmission) or (f.max_price is defined and f.max_price) %}
-            {% if hasFilters %}
+            {% set hasFilters = (f.category is defined and f.category) or (f.transmission is defined and f.transmission) or (f.max_price is defined and f.max_price) or (f.make is defined and f.make) or (f.model is defined and f.model) or (f.seats is defined and f.seats) or (f.sort is defined and f.sort != 'price_asc') %}
+            {% if hasFilters and not requireDates %}
                 <div class="mb-4" style="background: #f8f9fa; padding: 1rem; border-radius: 8px; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
                     <strong>Aktywne filtry:</strong>
-                    {% if f.category %}
-                        <span style="background:#e9ecef; padding: 0.25rem 0.5rem; border-radius: 4px;">Kategoria: {{ f.category }}</span>
-                    {% endif %}
-                    {% if f.transmission %}
-                        <span style="background:#e9ecef; padding: 0.25rem 0.5rem; border-radius: 4px;">Skrzynia: {{ f.transmission }}</span>
-                    {% endif %}
-                    {% if f.max_price %}
-                        <span style="background:#e9ecef; padding: 0.25rem 0.5rem; border-radius: 4px;">Max cena: {{ f.max_price }}</span>
-                    {% endif %}
+                    {% if f.category %}<span style="background:#e9ecef; padding: 0.25rem 0.5rem; border-radius: 4px;">Kategoria: {{ f.category }}</span>{% endif %}
+                    {% if f.transmission %}<span style="background:#e9ecef; padding: 0.25rem 0.5rem; border-radius: 4px;">Skrzynia: {{ f.transmission }}</span>{% endif %}
+                    {% if f.make %}<span style="background:#e9ecef; padding: 0.25rem 0.5rem; border-radius: 4px;">Marka: {{ f.make }}</span>{% endif %}
+                    {% if f.model %}<span style="background:#e9ecef; padding: 0.25rem 0.5rem; border-radius: 4px;">Model: {{ f.model }}</span>{% endif %}
+                    {% if f.seats %}<span style="background:#e9ecef; padding: 0.25rem 0.5rem; border-radius: 4px;">Miejsca: {{ f.seats }}</span>{% endif %}
+                    {% if f.max_price %}<span style="background:#e9ecef; padding: 0.25rem 0.5rem; border-radius: 4px;">Max cena: {{ f.max_price }}</span>{% endif %}
+                    {% if f.sort and f.sort != 'price_asc' %}<span style="background:#e9ecef; padding: 0.25rem 0.5rem; border-radius: 4px;">Sort: Najpierw droższe</span>{% endif %}
 
                     <a href="/offers" style="margin-left: auto; padding: 0.5rem 0.75rem; background: #dc3545; color: #fff; text-decoration: none; border-radius: 4px;">Wyczyść filtry</a>
                 </div>
             {% endif %}
 
             {# Wyniki #}
-            {% if cars is empty %}
-                <p>Brak wyników dla wybranych filtrów.</p>
+            {% if requireDates %}
+                <p>Ustaw najpierw daty, aby zobaczyć dostępne pojazdy.</p>
             {% else %}
-                <div class="row">
-                    {% for car in cars %}
-                        <div class="col-md-6 col-lg-4 mb-4">
-                            {% include 'partials/offer/_card.twig' with { car: car } %}
-                        </div>
-                    {% endfor %}
-                </div>
+                {% if cars is empty %}
+                    <p>Brak wyników dla wybranych warunków.</p>
+                {% else %}
+                    <div class="row">
+                        {% for car in cars %}
+                            <div class="col-md-6 col-lg-4 mb-4">
+                                {% include 'partials/offer/_card.twig' with { car: car } %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
             {% endif %}
         </div>
     </section>

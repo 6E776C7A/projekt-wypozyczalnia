@@ -1,6 +1,8 @@
 <div class="search-filters" style="background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
     {% set f = filters|default({}) %}
+    {% set d = dates|default({}) %}
     <form method="GET" action="/offers" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+
         <div>
             <label for="category" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Kategoria</label>
             <select id="category" name="category" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
@@ -20,8 +22,48 @@
             </select>
         </div>
         <div>
+            <label for="make" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Marka</label>
+            <select id="make" name="make" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
+                <option value="" {{ (f.make is not defined or f.make == '') ? 'selected' : '' }}>Wszystkie</option>
+                {% if makes is defined %}
+                    {% for m in makes %}
+                        <option value="{{ m }}" {{ (f.make is defined and f.make == m) ? 'selected' : '' }}>{{ m }}</option>
+                    {% endfor %}
+                {% endif %}
+            </select>
+        </div>
+        <div>
+            <label for="model" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Model</label>
+            <select id="model" name="model" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
+                <option value="" {{ (f.model is not defined or f.model == '') ? 'selected' : '' }}>Wszystkie</option>
+                {% if models is defined %}
+                    {% for mm in models %}
+                        <option value="{{ mm }}" {{ (f.model is defined and f.model == mm) ? 'selected' : '' }}>{{ mm }}</option>
+                    {% endfor %}
+                {% endif %}
+            </select>
+        </div>
+        <div>
+            <label for="seats" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Liczba miejsc</label>
+            <select id="seats" name="seats" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
+                <option value="" {{ (f.seats is not defined or f.seats == '') ? 'selected' : '' }}>Dowolna</option>
+                {% if seatsOptions is defined %}
+                    {% for s in seatsOptions %}
+                        <option value="{{ s }}" {{ (f.seats is defined and (f.seats ~ '') == (s ~ '')) ? 'selected' : '' }}>{{ s }}</option>
+                    {% endfor %}
+                {% endif %}
+            </select>
+        </div>
+        <div>
             <label for="max_price" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Maksymalna cena dzienna</label>
             <input type="number" id="max_price" name="max_price" placeholder="np. 200" value="{{ f.max_price is defined ? f.max_price : '' }}" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
+        </div>
+        <div>
+            <label for="sort" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Sortowanie</label>
+            <select id="sort" name="sort" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
+                <option value="price_asc" {{ (f.sort is not defined or f.sort == 'price_asc') ? 'selected' : '' }}>Cena: od najniższej</option>
+                <option value="price_desc" {{ (f.sort is defined and f.sort == 'price_desc') ? 'selected' : '' }}>Cena: od najwyższej</option>
+            </select>
         </div>
         <div style="display: flex; align-items: end;">
             <button type="submit" style="width: 100%; padding: 0.75rem; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Szukaj</button>

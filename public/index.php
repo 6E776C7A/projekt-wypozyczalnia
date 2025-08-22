@@ -90,6 +90,29 @@ function verifyRecaptcha($recaptchaResponse) {
     return $response['success'] ?? false;
 }
 
+function calculateTotalRentalCost(string $dateFrom, string $dateTo, float $workdayPrice, float $weekendPrice): float
+{
+    $start = date_create($dateFrom);
+    $end = date_create($dateTo);
+    if (!$start || !$end) {
+        return 0.0;
+    }
+
+    // Zakres zamknięty [from, to] – uwzględnij dzień końcowy
+    $endInclusive = (clone $end)->modify('+1 day');
+    $period = new DatePeriod($start, new DateInterval('P1D'), $endInclusive);
+
+    $total = 0.0;
+    foreach ($period as $day) {
+        // Dni tygodnia: 1 (pon) ... 7 (niedziela)
+        $dayOfWeek = (int)$day->format('N');
+        $isWeekend = ($dayOfWeek >= 6);
+        $total += $isWeekend ? $weekendPrice : $workdayPrice;
+    }
+
+    return $total;
+}
+
 // Krok 3: Inicjalizacja Twiga (systemu szablonów)
 $loader = new \Twig\Loader\FilesystemLoader(TEMPLATE_PATH);
 $twig = new \Twig\Environment($loader, [
@@ -199,7 +222,7 @@ switch ($requestUri) {
                         INSERT INTO cars (make, model, category, transmission, seats, workday_price, weekend_price, image_url) 
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                     ");
-                    $stmt->execute([$make, $model, $category, $transmission, $seats, $workdayPrice, $weekendPrice, $imageUrl]);
+                    $stmt->execute([$make, $model, $category, $transmission, (int)$seats, $workdayPrice, $weekendPrice, $imageUrl]);
                     
                     header('Location: /admin?status=added');
                     exit();
@@ -239,38 +262,127 @@ switch ($requestUri) {
         $category = $_GET['category'] ?? '';
         $transmission = $_GET['transmission'] ?? '';
         $maxPrice = $_GET['max_price'] ?? '';
+        $make = $_GET['make'] ?? '';
+        $model = $_GET['model'] ?? '';
+        $seatsFilter = $_GET['seats'] ?? '';
+        $sort = $_GET['sort'] ?? 'price_asc';
+        $dateFromGet = $_GET['date_from'] ?? '';
+        $dateToGet = $_GET['date_to'] ?? '';
 
-        // Budowa zapytania z warunkami opcjonalnymi
-        $sql = "SELECT * FROM cars WHERE 1=1";
-        $params = [];
-
-        if ($category !== '') {
-            $sql .= " AND category = :category";
-            $params[':category'] = $category;
-        }
-        if ($transmission !== '') {
-            $sql .= " AND transmission = :transmission";
-            $params[':transmission'] = $transmission;
-        }
-        if ($maxPrice !== '' && is_numeric($maxPrice)) {
-            // Filtrujemy po tańszej z cen (dzień roboczy) – można rozszerzyć zgodnie z wymaganiami
-            $sql .= " AND workday_price <= :max_price";
-            $params[':max_price'] = (float)$maxPrice;
+        // Jeśli podano nowe daty i są poprawne, zapisz w sesji
+        $dfNew = $dateFromGet ? date_create($dateFromGet) : null;
+        $dtNew = $dateToGet ? date_create($dateToGet) : null;
+        if ($dfNew && $dtNew && $dateFromGet <= $dateToGet) {
+            $_SESSION['search_dates'] = ['from' => $dateFromGet, 'to' => $dateToGet];
         }
 
-        $sql .= " ORDER BY id DESC";
+        // Odczytaj daty z sesji (utrzymanie niezależnie od filtrów)
+        $dateFrom = $_SESSION['search_dates']['from'] ?? '';
+        $dateTo = $_SESSION['search_dates']['to'] ?? '';
 
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute($params);
-        $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // Listy opcji (marki, modele, miejsca)
+        $makes = $pdo->query("SELECT DISTINCT make FROM cars ORDER BY make ASC")->fetchAll(PDO::FETCH_COLUMN);
+        $models = $pdo->query("SELECT DISTINCT model FROM cars ORDER BY model ASC")->fetchAll(PDO::FETCH_COLUMN);
+        $seatsOptions = $pdo->query("SELECT DISTINCT seats FROM cars ORDER BY seats ASC")->fetchAll(PDO::FETCH_COLUMN);
+
+        // Walidacja zakresu dat (wymagane)
+        $requireDates = false;
+        $isDateRangeValid = false;
+        if ($dateFrom === '' || $dateTo === '') {
+            $requireDates = true;
+        } else {
+            // Prosta walidacja kolejności
+            $df = date_create($dateFrom);
+            $dt = date_create($dateTo);
+            if ($df && $dt && $dateFrom <= $dateTo) {
+                $isDateRangeValid = true;
+            } else {
+                $requireDates = true;
+            }
+        }
+
+        $cars = [];
+
+        if ($isDateRangeValid) {
+            // Budowa zapytania z warunkami opcjonalnymi oraz sprawdzeniem dostępności w podanym zakresie dat
+            $sql = "SELECT * FROM cars WHERE 1=1";
+            $params = [];
+
+            if ($category !== '') {
+                $sql .= " AND category = :category";
+                $params[':category'] = $category;
+            }
+            if ($transmission !== '') {
+                $sql .= " AND transmission = :transmission";
+                $params[':transmission'] = $transmission;
+            }
+            if ($maxPrice !== '' && is_numeric($maxPrice)) {
+                // Filtrujemy po cenie dnia roboczego
+                $sql .= " AND workday_price <= :max_price";
+                $params[':max_price'] = (float)$maxPrice;
+            }
+            if ($make !== '') {
+                $sql .= " AND make = :make";
+                $params[':make'] = $make;
+            }
+            if ($model !== '') {
+                $sql .= " AND model = :model";
+                $params[':model'] = $model;
+            }
+            if ($seatsFilter !== '' && is_numeric($seatsFilter)) {
+                $sql .= " AND seats = :seats";
+                $params[':seats'] = (int)$seatsFilter;
+            }
+
+            // Dostępność (zakresy zamknięte): brak rezerwacji z częścią wspólną
+            // Kolizja jeśli: start_date <= date_to AND end_date >= date_from
+            $sql .= " AND id NOT IN (
+                SELECT car_id FROM reservations
+                WHERE (start_date <= :date_to) AND (end_date >= :date_from)
+            )";
+            $params[':date_from'] = $dateFrom;
+            $params[':date_to'] = $dateTo;
+
+            // Sortowanie wyników
+            if ($sort === 'price_desc') {
+                $sql .= " ORDER BY workday_price DESC, id DESC";
+            } else {
+                // Domyślnie od najniższej ceny
+                $sql .= " ORDER BY workday_price ASC, id DESC";
+            }
+
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($params);
+            $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Przelicz koszt za cały termin dla każdej oferty
+            foreach ($cars as &$car) {
+                $workday = (float)$car['workday_price'];
+                $weekend = (float)$car['weekend_price'];
+                $car['total_price'] = calculateTotalRentalCost($dateFrom, $dateTo, $workday, $weekend);
+            }
+            unset($car);
+        }
 
         echo $twig->render('pages/offer/list.twig', [
             'cars' => $cars,
             'filters' => [
                 'category' => $category,
                 'transmission' => $transmission,
-                'max_price' => $maxPrice
-            ]
+                'max_price' => $maxPrice,
+                'make' => $make,
+                'model' => $model,
+                'seats' => $seatsFilter,
+                'sort' => $sort
+            ],
+            'dates' => [
+                'from' => $dateFrom,
+                'to' => $dateTo
+            ],
+            'requireDates' => $requireDates,
+            'makes' => $makes,
+            'models' => $models,
+            'seatsOptions' => $seatsOptions
         ]);
         break;
 
