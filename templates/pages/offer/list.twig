@@ -37,6 +37,8 @@
             {% set hasFilters = (f.category is defined and f.category) or (f.transmission is defined and f.transmission) or (f.max_price is defined and f.max_price) or (f.make is defined and f.make) or (f.model is defined and f.model) or (f.seats is defined and f.seats) or (f.sort is defined and f.sort != 'price_asc') %}
             {% if status == 'booked' %}
                 <div class="mb-4" style="background:#d4edda; color:#155724; padding:1rem; border-radius:6px;">Rezerwacja przyjęta! Auto nie będzie już widoczne w tym terminie.</div>
+            {% elseif status == 'cancelled' %}
+                <div class="mb-4" style="background:#d1ecf1; color:#0c5460; padding:1rem; border-radius:6px;">Rezerwacja została anulowana. Auto wróciło do puli dostępnych pojazdów.</div>
             {% endif %}
 
             {% if hasFilters and not requireDates %}

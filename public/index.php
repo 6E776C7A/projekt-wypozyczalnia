@@ -228,6 +228,56 @@ if ($requestMethod === 'POST' && preg_match('#^/offers/(\d+)/book$#', $requestUr
         ':token' => $token
     ]);
 
+    // Wysyłka e-maila z potwierdzeniem rezerwacji i linkiem do anulowania
+    try {
+        // Wczytaj konfigurację mailera
+        $mailConfig = include __DIR__ . '/../config/mail.php';
+        
+        $transport = new \PHPMailer\PHPMailer\PHPMailer(true);
+        $transport->isSMTP();
+        $transport->Host = $mailConfig['smtp']['host'];
+        $transport->SMTPAuth = true;
+        $transport->Username = $mailConfig['smtp']['username'];
+        $transport->Password = $mailConfig['smtp']['password'];
+        $transport->Port = $mailConfig['smtp']['port'];
+        
+        // Ustaw szyfrowanie na podstawie konfiguracji
+        if ($mailConfig['smtp']['encryption'] === 'ssl') {
+            $transport->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
+        } else {
+            $transport->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+        }
+        
+        $transport->CharSet = 'UTF-8';
+        $transport->setFrom($mailConfig['smtp']['from_email'], $mailConfig['smtp']['from_name']);
+        $transport->addAddress($customerEmail);
+        $transport->isHTML(true);
+        $transport->Subject = 'Potwierdzenie rezerwacji – ' . $car['make'] . ' ' . $car['model'];
+
+        // Użyj HTTP dla lokalnego developmentu, HTTPS dla produkcji
+        $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
+        $cancelUrl = $protocol . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . '/reservations/cancel?token=' . urlencode($token);
+
+        $bodyHtml = $twig->render('emails/application_confirmation.twig', [
+            'car' => $car,
+            'dateFrom' => $dateFrom,
+            'dateTo' => $dateTo,
+            'totalCost' => $totalCost,
+            'cancelLink' => $cancelUrl,
+            'firstName' => $firstName,
+            'lastName' => $lastName
+        ]);
+        $transport->Body = $bodyHtml;
+        $transport->send();
+        
+        // Log sukcesu
+        error_log('Email sent successfully to: ' . $customerEmail);
+        
+    } catch (\Throwable $e) {
+        error_log('Email send failed: ' . $e->getMessage());
+        // Możesz też dodać fallback - np. zapisać rezerwację bez wysłania emaila
+    }
+
     header('Location: /offers?status=booked');
     exit();
 }
@@ -292,19 +342,13 @@ switch ($requestUri) {
                     header('Location: /admin');
                     exit();
                 } else {
-                    // Pobierz samochody do wyświetlenia w panelu
-                    $stmt = $pdo->query("SELECT * FROM cars ORDER BY id DESC");
-                    $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-                    // Pobierz rezerwacje (z nazwą auta)
-                    $rstmt = $pdo->query("SELECT r.*, c.make, c.model FROM reservations r JOIN cars c ON c.id = r.car_id ORDER BY r.created_at DESC");
-                    $reservations = $rstmt->fetchAll(PDO::FETCH_ASSOC);
-
+                    // Logowanie nie powiodło się - pokaż formularz logowania z błędem
                     echo $twig->render('pages/admin/dashboard.twig', [
-                        'cars' => $cars,
-                        'reservations' => $reservations,
-                        'status' => $_GET['status'] ?? null,
-                        'username' => $_SESSION['admin_username'] ?? 'Admin',
+                        'cars' => [],
+                        'reservations' => [],
+                        'status' => null,
+                        'username' => null,
+                        'show_login' => true,
                         'login_error' => 'Nieprawidłowa nazwa użytkownika lub hasło'
                     ]);
                     exit();
@@ -532,6 +576,42 @@ switch ($requestUri) {
             exit();
         }
         header('Location: /admin');
+        exit();
+
+    // --- TRASA: Anulowanie rezerwacji przez klienta ---
+    // Adres: GET /reservations/cancel?token=...
+    case '/reservations/cancel':
+        $token = $_GET['token'] ?? '';
+        if (!$token) {
+            echo $twig->render('pages/static/404.twig');
+            break;
+        }
+
+        $stmt = $pdo->prepare("SELECT * FROM reservations WHERE cancellation_token = :token");
+        $stmt->execute([':token' => $token]);
+        $reservation = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$reservation) {
+            echo $twig->render('pages/static/404.twig');
+            break;
+        }
+
+        // Sprawdź czy można anulować (>48h przed startem)
+        $startDate = new DateTime($reservation['start_date']);
+        $now = new DateTime();
+        $hoursUntilStart = ($startDate->getTimestamp() - $now->getTimestamp()) / 3600;
+        
+        if ($hoursUntilStart < 48) {
+            echo $twig->render('pages/static/404.twig', [
+                'error_message' => 'Nie można anulować rezerwacji na mniej niż 48 godzin przed datą odbioru.'
+            ]);
+            break;
+        }
+        
+        $del = $pdo->prepare("DELETE FROM reservations WHERE id = :id");
+        $del->execute([':id' => $reservation['id']]);
+
+        header('Location: /offers?status=cancelled');
         exit();
 
     // --- Domyślna trasa, gdy strona nie istnieje ---

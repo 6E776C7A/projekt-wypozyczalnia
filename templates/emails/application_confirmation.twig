@@ -1,0 +1,21 @@
+<div style="font-family: Arial, sans-serif; font-size: 14px; color: #222;">
+  <p>Witaj {{ firstName }} {{ lastName }},</p>
+
+  <p>Dziękujemy za dokonanie rezerwacji w naszej wypożyczalni.</p>
+
+  <h3>Szczegóły rezerwacji</h3>
+  <ul>
+    <li>Samochód: {{ car.make }} {{ car.model }}</li>
+    <li>Okres: {{ dateFrom }} – {{ dateTo }}</li>
+    <li>Całkowity koszt: {{ totalCost }} PLN</li>
+  </ul>
+
+  <p>Jeśli chcesz anulować rezerwację, skorzystaj z poniższego linku:</p>
+  <p>
+    <a href="{{ cancelLink }}" target="_blank">Anuluj rezerwację</a>
+  </p>
+
+  <p style="color:#666; font-size:12px;">Jeżeli to nie Ty dokonałeś rezerwacji, zignoruj tę wiadomość.</p>
+</div>
+
+

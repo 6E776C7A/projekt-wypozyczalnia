@@ -22,7 +22,7 @@ class MailerService
         $this->mailer->Host = 'smtp.poczta.onet.pl';       // Serwer SMTP dla Onetu
         $this->mailer->SMTPAuth = true;
         $this->mailer->Username = 'auto_wypozyczalnia@onet.pl';   // Przykładowy e-mail
-        $this->mailer->Password = 'auta_haslo';                   // Przykładowe hasło
+        $this->mailer->Password = 'auta_haslo1';                   // Przykładowe hasło
         $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // Typ szyfrowania
         $this->mailer->Port = 465;                        // Port dla SMTPS/SSL
 
