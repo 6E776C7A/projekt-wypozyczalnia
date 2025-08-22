@@ -152,12 +152,10 @@ if (preg_match('#^/offers/(\d+)$#', $requestUri, $matches)) {
     $dateTo = $_SESSION['search_dates']['to'] ?? '';
 
     $totalPrice = null;
-    $isDateRangeValid = false;
     if ($dateFrom && $dateTo) {
         $df = date_create($dateFrom);
         $dt = date_create($dateTo);
         if ($df && $dt && $dateFrom <= $dateTo) {
-            $isDateRangeValid = true;
             $totalPrice = calculateTotalRentalCost($dateFrom, $dateTo, (float)$car['workday_price'], (float)$car['weekend_price']);
         }
     }
@@ -166,7 +164,6 @@ if (preg_match('#^/offers/(\d+)$#', $requestUri, $matches)) {
         'car' => $car,
         'dates' => [ 'from' => $dateFrom, 'to' => $dateTo ],
         'total_price' => $totalPrice,
-        'requireDates' => !$isDateRangeValid,
         'status' => $_GET['status'] ?? null
     ]);
     exit();
@@ -204,6 +201,13 @@ if ($requestMethod === 'POST' && preg_match('#^/offers/(\d+)/book$#', $requestUr
         exit();
     }
 
+    // Sprawdź reCAPTCHA
+    $recaptchaResponse = $_POST['g-recaptcha-response'] ?? '';
+    if (!verifyRecaptcha($recaptchaResponse)) {
+        header('Location: /offers/' . $carId . '?status=captcha_error');
+        exit();
+    }
+
     // Dane klienta
     $customerEmail = trim($_POST['email'] ?? '');
     $firstName = trim($_POST['first_name'] ?? '');
@@ -228,56 +232,6 @@ if ($requestMethod === 'POST' && preg_match('#^/offers/(\d+)/book$#', $requestUr
         ':token' => $token
     ]);
 
-    // Wysyłka e-maila z potwierdzeniem rezerwacji i linkiem do anulowania
-    try {
-        // Wczytaj konfigurację mailera
-        $mailConfig = include __DIR__ . '/../config/mail.php';
-        
-        $transport = new \PHPMailer\PHPMailer\PHPMailer(true);
-        $transport->isSMTP();
-        $transport->Host = $mailConfig['smtp']['host'];
-        $transport->SMTPAuth = true;
-        $transport->Username = $mailConfig['smtp']['username'];
-        $transport->Password = $mailConfig['smtp']['password'];
-        $transport->Port = $mailConfig['smtp']['port'];
-        
-        // Ustaw szyfrowanie na podstawie konfiguracji
-        if ($mailConfig['smtp']['encryption'] === 'ssl') {
-            $transport->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
-        } else {
-            $transport->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
-        }
-        
-        $transport->CharSet = 'UTF-8';
-        $transport->setFrom($mailConfig['smtp']['from_email'], $mailConfig['smtp']['from_name']);
-        $transport->addAddress($customerEmail);
-        $transport->isHTML(true);
-        $transport->Subject = 'Potwierdzenie rezerwacji – ' . $car['make'] . ' ' . $car['model'];
-
-        // Użyj HTTP dla lokalnego developmentu, HTTPS dla produkcji
-        $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
-        $cancelUrl = $protocol . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . '/reservations/cancel?token=' . urlencode($token);
-
-        $bodyHtml = $twig->render('emails/application_confirmation.twig', [
-            'car' => $car,
-            'dateFrom' => $dateFrom,
-            'dateTo' => $dateTo,
-            'totalCost' => $totalCost,
-            'cancelLink' => $cancelUrl,
-            'firstName' => $firstName,
-            'lastName' => $lastName
-        ]);
-        $transport->Body = $bodyHtml;
-        $transport->send();
-        
-        // Log sukcesu
-        error_log('Email sent successfully to: ' . $customerEmail);
-        
-    } catch (\Throwable $e) {
-        error_log('Email send failed: ' . $e->getMessage());
-        // Możesz też dodać fallback - np. zapisać rezerwację bez wysłania emaila
-    }
-
     header('Location: /offers?status=booked');
     exit();
 }
@@ -286,40 +240,20 @@ switch ($requestUri) {
     // --- TRASA: Strona główna ---
     // Adres: http://localhost:8080/
     case '/':
-        if ($requestMethod === 'POST') {
-            // Sprawdź reCAPTCHA
-            $recaptchaResponse = $_POST['g-recaptcha-response'] ?? '';
-            
-            if (verifyRecaptcha($recaptchaResponse)) {
-                // reCAPTCHA przeszła weryfikację
-                $_SESSION['captcha_verified'] = true;
-                header('Location: /offers');
-                exit();
-            } else {
-                // reCAPTCHA nie przeszła weryfikacji
-                echo $twig->render('pages/home.twig', [
-                    'featured_cars' => [],
-                    'captcha_verified' => false,
-                    'captcha_error' => 'Proszę zaznaczyć reCAPTCHA przed przejściem dalej.'
-                ]);
-                exit();
-            }
-        } else {
-            // GET request - sprawdź czy użytkownik przeszedł weryfikację
-            $captchaVerified = $_SESSION['captcha_verified'] ?? false;
-            
-            if ($captchaVerified) {
-                // Użytkownik przeszedł weryfikację - pokaż listę ofert
-                header('Location: /offers');
-                exit();
-            } else {
-                // Użytkownik nie przeszedł weryfikacji - pokaż reCAPTCHA
-                echo $twig->render('pages/home.twig', [
-                    'featured_cars' => [],
-                    'captcha_verified' => false
-                ]);
-            }
+        // GET request - pokaż stronę główną z formularzem wyboru dat
+        $dateError = '';
+        $dates = [];
+        
+        // Sprawdź czy są błędy walidacji dat
+        if (isset($_GET['date_error'])) {
+            $dateError = $_GET['date_error'];
         }
+        
+        // Pokaż stronę główną z formularzem wyboru dat
+        echo $twig->render('pages/home.twig', [
+            'dates' => $dates,
+            'date_error' => $dateError
+        ]);
         break;
 
     // --- TRASA: Wylogowanie ---
@@ -424,11 +358,30 @@ switch ($requestUri) {
         $dateFromGet = $_GET['date_from'] ?? '';
         $dateToGet = $_GET['date_to'] ?? '';
 
-        // Jeśli podano nowe daty i są poprawne, zapisz w sesji
-        $dfNew = $dateFromGet ? date_create($dateFromGet) : null;
-        $dtNew = $dateToGet ? date_create($dateToGet) : null;
-        if ($dfNew && $dtNew && $dateFromGet <= $dateToGet) {
-            $_SESSION['search_dates'] = ['from' => $dateFromGet, 'to' => $dateToGet];
+        // Jeśli podano nowe daty, zwaliduj je
+        if ($dateFromGet && $dateToGet) {
+            $dfNew = date_create($dateFromGet);
+            $dtNew = date_create($dateToGet);
+            
+            // Sprawdź czy daty są poprawne
+            if ($dfNew && $dtNew && $dateFromGet <= $dateToGet) {
+                // Sprawdź czy data początkowa nie jest w przeszłości
+                $today = new DateTime();
+                $today->setTime(0, 0, 0);
+                $dfNew->setTime(0, 0, 0);
+                
+                if ($dfNew >= $today) {
+                    $_SESSION['search_dates'] = ['from' => $dateFromGet, 'to' => $dateToGet];
+                } else {
+                    // Data w przeszłości - przekieruj z błędem
+                    header('Location: /?date_error=Data_początkowa_nie_może_być_w_przeszłości');
+                    exit();
+                }
+            } else {
+                // Nieprawidłowy zakres dat - przekieruj z błędem
+                header('Location: /?date_error=Data_końcowa_musi_być_późniejsza_niż_początkowa');
+                exit();
+            }
         }
 
         // Odczytaj daty z sesji (utrzymanie niezależnie od filtrów)
@@ -441,19 +394,36 @@ switch ($requestUri) {
         $seatsOptions = $pdo->query("SELECT DISTINCT seats FROM cars ORDER BY seats ASC")->fetchAll(PDO::FETCH_COLUMN);
 
         // Walidacja zakresu dat (wymagane)
-        $requireDates = false;
         $isDateRangeValid = false;
         if ($dateFrom === '' || $dateTo === '') {
-            $requireDates = true;
+            header('Location: /?date_error=Wybierz_poprawny_termin_wypożyczenia');
+            exit();
         } else {
             // Prosta walidacja kolejności
             $df = date_create($dateFrom);
             $dt = date_create($dateTo);
             if ($df && $dt && $dateFrom <= $dateTo) {
-                $isDateRangeValid = true;
+                // Sprawdź czy data początkowa nie jest w przeszłości
+                $today = new DateTime();
+                $today->setTime(0, 0, 0);
+                $df->setTime(0, 0, 0);
+                
+                if ($df >= $today) {
+                    $isDateRangeValid = true;
+                } else {
+                    header('Location: /?date_error=Data_początkowa_nie_może_być_w_przeszłości');
+                    exit();
+                }
             } else {
-                $requireDates = true;
+                header('Location: /?date_error=Data_końcowa_musi_być_późniejsza_niż_początkowa');
+                exit();
             }
+        }
+        
+        // Jeśli nie ma ważnych dat, przekieruj do strony głównej
+        if (!$isDateRangeValid) {
+            header('Location: /?date_error=Wybierz_poprawny_termin_wypożyczenia');
+            exit();
         }
 
         $cars = [];
@@ -534,7 +504,6 @@ switch ($requestUri) {
                 'from' => $dateFrom,
                 'to' => $dateTo
             ],
-            'requireDates' => $requireDates,
             'makes' => $makes,
             'models' => $models,
             'seatsOptions' => $seatsOptions,

@@ -19,7 +19,7 @@ RUN chown -R www-data:www-data /var/www/html
 # Ustaw uprawnienia do bazy danych
 RUN mkdir -p /var/www/html/data && \
     chown -R www-data:www-data /var/www/html/data && \
-    chmod -R 755 /var/www/html/data
+    chmod -R 777 /var/www/html/data
 
 WORKDIR /var/www/html
 
@@ -28,5 +28,5 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # Upewnij się, że baza danych ma odpowiednie uprawnienia
 RUN if [ -f /var/www/html/data/mydb.sqlite ]; then \
         chown www-data:www-data /var/www/html/data/mydb.sqlite && \
-        chmod 664 /var/www/html/data/mydb.sqlite; \
+        chmod 777 /var/www/html/data/mydb.sqlite; \
     fi

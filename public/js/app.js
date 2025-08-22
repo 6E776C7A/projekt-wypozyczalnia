@@ -34,14 +34,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Automatyczne ukrywanie alertów po 5 sekundach
-    const alerts = document.querySelectorAll('.alert');
+    // Automatyczne ukrywanie tylko dla alertów z klasą .auto-hide
+    const alerts = document.querySelectorAll('.alert.auto-hide');
     alerts.forEach(alert => {
+        const delay = parseInt(alert.getAttribute('data-hide-delay')) || 5000;
         setTimeout(() => {
+            alert.style.transition = 'opacity 0.5s ease-out';
             alert.style.opacity = '0';
             setTimeout(() => {
-                alert.remove();
-            }, 300);
-        }, 5000);
+                alert.style.display = 'none';
+            }, 500);
+        }, delay);
     });
 });

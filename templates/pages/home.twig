@@ -3,52 +3,104 @@
 {% block title %}Strona główna | {{ parent() }}{% endblock %}
 
 {% block content %}
-    {% if not captcha_verified %}
-        {# Formularz reCAPTCHA v2 - gdy użytkownik nie przeszedł weryfikacji #}
-        <div class="captcha-container">
-            <div class="captcha-form">
-                <h1>Weryfikacja bezpieczeństwa</h1>
-                <p>Przed przejściem do strony głównej, prosimy o weryfikację, że nie jesteś robotem.</p>
-                
-                {% if captcha_error %}
-                    <div class="captcha-error">
-                        {{ captcha_error }}
+    {# Sekcja "Hero" z głównym hasłem i wyszukiwarką #}
+    <section class="hero-section text-center py-5">
+        <h1>Samochód w abonamencie lub leasingu. Prościej się nie da.</h1>
+        <p class="lead">Wybierz auto, dopasuj ratę i odbierz kluczyki.</p>
+        
+        <div class="container mt-4">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="date-selection-form" style="background: #f8f9fa; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                        <h3 class="mb-4">Wybierz termin wypożyczenia</h3>
+                        <p class="text-muted mb-4">Ustaw datę rozpoczęcia i zakończenia, aby zobaczyć dostępne pojazdy</p>
+                        
+                        <form method="GET" action="/offers" class="row g-3">
+                            <div class="col-md-5">
+                                <label for="date_from" class="form-label fw-bold" style="color: black;">Data od</label>
+                                <input type="date" 
+                                       id="date_from" 
+                                       name="date_from" 
+                                       class="form-control form-control-lg" 
+                                       required 
+                                       min="{{ "now"|date("Y-m-d") }}"
+                                       value="{{ dates.from|default('') }}">
+                            </div>
+                            <div class="col-md-5">
+                                <label for="date_to" class="form-label fw-bold" style="color: black;">Data do</label>
+                                <input type="date" 
+                                       id="date_to" 
+                                       name="date_to" 
+                                       class="form-control form-control-lg" 
+                                       required 
+                                       min="{{ "now"|date("Y-m-d") }}"
+                                       value="{{ dates.to|default('') }}">
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary btn-lg w-100">
+                                    Szukaj
+                                </button>
+                            </div>
+                        </form>
+                        
+                        {% if date_error %}
+                            <div class="alert alert-warning mt-3 auto-hide" role="alert" data-hide-delay="8000">
+                                {% if date_error == 'Data_początkowa_nie_może_być_w_przeszłości' %}
+                                    <strong>Błąd:</strong> Data początkowa nie może być w przeszłości. Wybierz datę od dzisiaj.
+                                {% elseif date_error == 'Data_końcowa_musi_być_późniejsza_niż_początkowa' %}
+                                    <strong>Błąd:</strong> Data końcowa musi być późniejsza niż początkowa.
+                                {% elseif date_error == 'Wybierz_poprawny_termin_wypożyczenia' %}
+                                    <strong>Błąd:</strong> Wybierz poprawny termin wypożyczenia.
+                                {% else %}
+                                    {{ date_error }}
+                                {% endif %}
+                            </div>
+                        {% endif %}
                     </div>
-                {% endif %}
-                
-                <form method="POST" action="/">
-                    <div id="g-recaptcha" class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"></div>
-                    <button type="submit" class="captcha-button">Przejdź do strony głównej</button>
-                </form>
-                
-                <div style="text-align: center; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #eee;">
-                    <a href="/" style="color: #007bff; text-decoration: none;">← Wróć do strony głównej</a>
                 </div>
             </div>
         </div>
-    {% else %}
-        {# Treść strony głównej - gdy użytkownik przeszedł weryfikację #}
-        {# Sekcja "Hero" z głównym hasłem i wyszukiwarką #}
-        <section class="hero-section text-center py-5">
-            <h1>Samochód w abonamencie lub leasingu. Prościej się nie da.</h1>
-            <p class="lead">Wybierz auto, dopasuj ratę i odbierz kluczyki.</p>
-            <div class="container mt-4">
-                {# Dołączamy komponent wyszukiwarki/filtrów #}
-                {% include 'partials/offer/_filters.twig' %}
-            </div>
-        </section>
-
-        {# Usunięto sekcję z polecanymi ofertami #}
-
-        {# Sekcja "Jak to działa?" #}
-        <section class="how-it-works-section py-5">
-            {# ... treść wyjaśniająca proces w 3-4 krokach ... #}
-        </section>
-    {% endif %}
+    </section>
 {% endblock %}
 
 {% block javascripts %}
-    {% if not captcha_verified %}
-        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-    {% endif %}
+<script>
+// Walidacja dat - data końcowa nie może być wcześniejsza niż początkowa
+document.addEventListener('DOMContentLoaded', function() {
+    const dateFrom = document.getElementById('date_from');
+    const dateTo = document.getElementById('date_to');
+    
+    function updateDateToMin() {
+        if (dateFrom.value) {
+            dateTo.min = dateFrom.value;
+            if (dateTo.value && dateTo.value < dateFrom.value) {
+                dateTo.value = dateFrom.value;
+            }
+        }
+    }
+    
+    dateFrom.addEventListener('change', updateDateToMin);
+    
+    // Ustaw minimalną datę dla obu pól na dzisiaj
+    const today = new Date().toISOString().split('T')[0];
+    dateFrom.min = today;
+    dateTo.min = today;
+    
+    // Auto-hide dla komunikatów błędów
+    const autoHideAlerts = document.querySelectorAll('.auto-hide');
+    
+    autoHideAlerts.forEach(function(alert) {
+        const delay = parseInt(alert.getAttribute('data-hide-delay')) || 8000;
+        
+        setTimeout(function() {
+            alert.style.transition = 'opacity 0.5s ease-out';
+            alert.style.opacity = '0';
+            
+            setTimeout(function() {
+                alert.style.display = 'none';
+            }, 500);
+        }, delay);
+    });
+});
+</script>
 {% endblock %}

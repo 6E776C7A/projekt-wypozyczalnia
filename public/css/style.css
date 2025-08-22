@@ -7,13 +7,124 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f8f9fa;
+    /* Globalne tło gradientowe dla wszystkich stron */
+    background: linear-gradient(135deg, #eef1ff 0%, #f8f9ff 50%, #ffffff 100%);
+    background-attachment: fixed;
 }
 
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 1rem;
+}
+
+/* Style dla strony głównej */
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 4rem 0;
+}
+
+.hero-section h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    font-weight: 300;
+}
+
+.hero-section .lead {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+.date-selection-form {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    margin-top: 2rem;
+}
+
+.date-selection-form h3 {
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.date-selection-form .text-muted {
+    color: #6c757d !important;
+}
+
+.form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    outline: 0;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: transform 0.2s ease-in-out;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.btn-outline-primary {
+    border: 2px solid #667eea;
+    color: #667eea;
+    background: transparent;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-outline-primary:hover {
+    background: #667eea;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Style dla sekcji "Jak to działa" */
+.how-it-works-section {
+    background: white;
+    padding: 4rem 0;
+}
+
+.how-it-works-section h2 {
+    color: #333;
+    margin-bottom: 3rem;
+}
+
+.step-icon {
+    margin-bottom: 1.5rem;
+}
+
+.step-icon i {
+    color: #667eea;
+}
+
+.how-it-works-section h4 {
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.how-it-works-section p {
+    color: #6c757d;
+    line-height: 1.6;
 }
 
 /* Style dla formularzy */

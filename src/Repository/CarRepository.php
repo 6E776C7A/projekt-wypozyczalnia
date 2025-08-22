@@ -16,7 +16,7 @@ class CarRepository
 
     public function findById(int $id): ?array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM samochody WHERE id = :id");
+        $stmt = $this->pdo->prepare("SELECT * FROM cars WHERE id = :id");
         $stmt->execute([':id' => $id]);
         $result = $stmt->fetch();
         return $result ?: null;
@@ -24,10 +24,10 @@ class CarRepository
 
     public function findAvailableCars(string $dateFrom, string $dateTo, array $filters = []): array
     {
-        $sql = "SELECT * FROM samochody s
-                WHERE s.id NOT IN (
-                    SELECT r.samochod_id FROM rezerwacje r
-                    WHERE (r.data_od < :date_to) AND (r.data_do > :date_from)
+        $sql = "SELECT * FROM cars c
+                WHERE c.id NOT IN (
+                    SELECT r.car_id FROM reservations r
+                    WHERE (r.start_date <= :date_to) AND (r.end_date >= :date_from)
                 )";
 
         $stmt = $this->pdo->prepare($sql);
@@ -35,16 +35,16 @@ class CarRepository
         return $stmt->fetchAll();
     }
 
-    public function saveBooking(int $carId, string $email, string $dateFrom, string $dateTo, float $totalCost, string $token): bool
+    public function saveBooking(int $carId, string $email, string $firstName, string $lastName, string $dateFrom, string $dateTo, float $totalCost, string $token): bool
     {
-        $sql = "INSERT INTO rezerwacje (samochod_id, email_klienta, data_od, data_do, calkowity_koszt, token_anulowania)
-                VALUES (:car_id, :email, :date_from, :date_to, :cost, :token)";
+        $sql = "INSERT INTO reservations (car_id, start_date, end_date, customer_email, total_cost, cancellation_token) 
+                VALUES (:car_id, :start_date, :end_date, :email, :cost, :token)";
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([
             ':car_id' => $carId,
+            ':start_date' => $dateFrom,
+            ':end_date' => $dateTo,
             ':email' => $email,
-            ':date_from' => $dateFrom,
-            ':date_to' => $dateTo,
             ':cost' => $totalCost,
             ':token' => $token
         ]);
@@ -52,7 +52,7 @@ class CarRepository
 
     public function findBookingByToken(string $token): ?array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM rezerwacje WHERE token_anulowania = :token");
+        $stmt = $this->pdo->prepare("SELECT * FROM reservations WHERE cancellation_token = :token");
         $stmt->execute([':token' => $token]);
         $result = $stmt->fetch();
         return $result ?: null;
@@ -60,7 +60,25 @@ class CarRepository
 
     public function deleteBookingById(int $id): bool
     {
-        $stmt = $this->pdo->prepare("DELETE FROM rezerwacje WHERE id = :id");
+        $stmt = $this->pdo->prepare("DELETE FROM reservations WHERE id = :id");
         return $stmt->execute([':id' => $id]);
+    }
+
+    public function getDistinctMakes(): array
+    {
+        $stmt = $this->pdo->query("SELECT DISTINCT make FROM cars ORDER BY make ASC");
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    public function getDistinctModels(): array
+    {
+        $stmt = $this->pdo->query("SELECT DISTINCT model FROM cars ORDER BY model ASC");
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    public function getDistinctSeats(): array
+    {
+        $stmt = $this->pdo->query("SELECT DISTINCT seats FROM cars ORDER BY seats ASC");
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
 }

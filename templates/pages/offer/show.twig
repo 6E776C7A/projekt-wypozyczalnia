@@ -23,6 +23,10 @@
             <div class="alert alert-warning" role="alert" style="background:#fff3cd; color:#856404; padding:1rem; border-radius:6px; margin-bottom:1rem;">
                 Niestety w wybranym terminie pojazd jest niedostępny.
             </div>
+        {% elseif status == 'captcha_error' %}
+            <div class="alert alert-danger" role="alert" style="background:#f8d7da; color:#721c24; padding:1rem; border-radius:6px; margin-bottom:1rem;">
+                Proszę zaznaczyć reCAPTCHA przed złożeniem rezerwacji.
+            </div>
         {% endif %}
 
         <div class="row">
@@ -42,18 +46,12 @@
                     <li><strong>Doba (weekend):</strong> {{ car.weekend_price|number_format(2, ',', ' ') }} zł</li>
                 </ul>
 
-                {% if dates.from and dates.to %}
-                    <div style="background:#f8f9fa; padding:1rem; border-radius:8px; margin-bottom:1rem;">
-                        <p style="margin:0 0 .25rem 0;">Termin: <strong>{{ dates.from }}</strong> — <strong>{{ dates.to }}</strong></p>
-                        {% if total_price is not null %}
-                            <p style="margin:0;">Cena za cały termin: <strong>{{ total_price|number_format(2, ',', ' ') }} zł</strong></p>
-                        {% endif %}
-                    </div>
-                {% else %}
-                    <div style="background:#fff3cd; color:#856404; padding:1rem; border-radius:8px; margin-bottom:1rem;">
-                        Ustaw najpierw termin wypożyczenia na liście ofert.
-                    </div>
-                {% endif %}
+                <div style="background:#f8f9fa; padding:1rem; border-radius:8px; margin-bottom:1rem;">
+                    <p style="margin:0 0 .25rem 0;">Termin: <strong>{{ dates.from }}</strong> — <strong>{{ dates.to }}</strong></p>
+                    {% if total_price is not null %}
+                        <p style="margin:0;">Cena za cały termin: <strong>{{ total_price|number_format(2, ',', ' ') }} zł</strong></p>
+                    {% endif %}
+                </div>
 
                 <h3 class="h5 mb-3">Dane wypożyczającego</h3>
                 <form method="POST" action="/offers/{{ car.id }}/book" style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
@@ -69,13 +67,26 @@
                         <label for="email" style="display:block; margin-bottom:.5rem;">E-mail</label>
                         <input type="email" id="email" name="email" required style="width:100%; padding:.5rem; border:1px solid #ddd; border-radius:5px;">
                     </div>
+                    
+                    {# reCAPTCHA #}
+                    <div style="grid-column: span 2; margin: 1rem 0;">
+                        <div class="captcha-container">
+                            <p class="text-muted mb-2"><small>Przed złożeniem rezerwacji, potwierdź że nie jesteś robotem:</small></p>
+                            <div id="g-recaptcha" class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"></div>
+                        </div>
+                    </div>
+                    
                     <div style="grid-column: span 2; display:flex; gap:.75rem;">
                         <a href="/offers" style="padding:.75rem 1rem; background:#6c757d; color:#fff; text-decoration:none; border-radius:5px;">Wróć</a>
-                        <button type="submit" style="padding:.75rem 1rem; background:#007bff; color:#fff; border:none; border-radius:5px; cursor:pointer;">Zarezerwuj</button>
+                        <button type="submit" class="btn btn-primary" style="padding:.75rem 1rem; background:#007bff; color:#fff; border:none; border-radius:5px; cursor:pointer;">Zarezerwuj</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </section>
+{% endblock %}
+
+{% block javascripts %}
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 {% endblock %}

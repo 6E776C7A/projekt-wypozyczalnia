@@ -5,29 +5,18 @@
 {% block content %}
     <section class="offers-list py-5">
         <div class="container">
-            <h1 class="text-center mb-4">Wszystkie pojazdy</h1>
-
-            {# Formularz wyboru zakresu dat (wymagany) #}
-            {% set d = dates|default({}) %}
-            <form method="GET" action="/offers" class="mb-4" style="display:flex; gap: 1rem; align-items: end; flex-wrap: wrap;">
-                <div>
-                    <label for="date_from" style="display:block; margin-bottom: .5rem; font-weight: bold;">Data od</label>
-                    <input type="date" id="date_from" name="date_from" value="{{ d.from is defined ? d.from : '' }}" style="padding: .5rem; border: 1px solid #ddd; border-radius: 5px;">
+            {# Header: tytuł, pod nim przycisk zmiany terminu, a następnie zakres dat #}
+            <div class="mb-4">
+                <h1 class="h2 mb-1">Dostępne pojazdy</h1>
+                <div class="mt-2">
+                    <a href="/" class="btn btn-danger btn-sm">Zmień termin</a>
                 </div>
-                <div>
-                    <label for="date_to" style="display:block; margin-bottom: .5rem; font-weight: bold;">Data do</label>
-                    <input type="date" id="date_to" name="date_to" value="{{ d.to is defined ? d.to : '' }}" style="padding: .5rem; border: 1px solid #ddd; border-radius: 5px;">
-                </div>
-                <div>
-                    <button type="submit" style="padding: 0.75rem 1rem; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">Ustaw termin</button>
-                </div>
-            </form>
+                {% if dates.from and dates.to %}
+                    <p class="text-muted mb-0 mt-2">Termin: <strong>{{ dates.from }}</strong> — <strong>{{ dates.to }}</strong></p>
+                {% endif %}
+            </div>
 
-            {% if requireDates %}
-                <div class="mb-4" style="background:#fff3cd; color:#856404; border:1px solid #ffeeba; padding: 1rem; border-radius: 6px;">Podaj proszę zakres dat, aby zobaczyć dostępne oferty.</div>
-            {% endif %}
-
-            {# Filtry wyszukiwania (poprzedni wygląd) #}
+            {# Filtry wyszukiwania #}
             <div class="mb-4">
                 {% include 'partials/offer/_filters.twig' %}
             </div>
@@ -35,42 +24,48 @@
             {# Aktywne filtry + przycisk do anulowania #}
             {% set f = filters|default({}) %}
             {% set hasFilters = (f.category is defined and f.category) or (f.transmission is defined and f.transmission) or (f.max_price is defined and f.max_price) or (f.make is defined and f.make) or (f.model is defined and f.model) or (f.seats is defined and f.seats) or (f.sort is defined and f.sort != 'price_asc') %}
+            
             {% if status == 'booked' %}
-                <div class="mb-4" style="background:#d4edda; color:#155724; padding:1rem; border-radius:6px;">Rezerwacja przyjęta! Auto nie będzie już widoczne w tym terminie.</div>
+                <div class="mb-4 alert alert-success auto-hide" role="alert" data-hide-delay="5000">
+                    Rezerwacja przyjęta! Auto nie będzie już widoczne w tym terminie.
+                </div>
             {% elseif status == 'cancelled' %}
-                <div class="mb-4" style="background:#d1ecf1; color:#0c5460; padding:1rem; border-radius:6px;">Rezerwacja została anulowana. Auto wróciło do puli dostępnych pojazdów.</div>
+                <div class="mb-4 alert alert-info auto-hide" role="alert" data-hide-delay="5000">
+                    Rezerwacja została anulowana. Auto wróciło do puli dostępnych pojazdów.
+                </div>
             {% endif %}
 
-            {% if hasFilters and not requireDates %}
+            {% if hasFilters %}
                 <div class="mb-4" style="background: #f8f9fa; padding: 1rem; border-radius: 8px; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
                     <strong>Aktywne filtry:</strong>
-                    {% if f.category %}<span style="background:#e9ecef; padding: 0.25rem 0.5rem; border-radius: 4px;">Kategoria: {{ f.category }}</span>{% endif %}
-                    {% if f.transmission %}<span style="background:#e9ecef; padding: 0.25rem 0.5rem; border-radius: 4px;">Skrzynia: {{ f.transmission }}</span>{% endif %}
-                    {% if f.make %}<span style="background:#e9ecef; padding: 0.25rem 0.5rem; border-radius: 4px;">Marka: {{ f.make }}</span>{% endif %}
-                    {% if f.model %}<span style="background:#e9ecef; padding: 0.25rem 0.5rem; border-radius: 4px;">Model: {{ f.model }}</span>{% endif %}
-                    {% if f.seats %}<span style="background:#e9ecef; padding: 0.25rem 0.5rem; border-radius: 4px;">Miejsca: {{ f.seats }}</span>{% endif %}
-                    {% if f.max_price %}<span style="background:#e9ecef; padding: 0.25rem 0.5rem; border-radius: 4px;">Max cena: {{ f.max_price }}</span>{% endif %}
-                    {% if f.sort and f.sort != 'price_asc' %}<span style="background:#e9ecef; padding: 0.25rem 0.5rem; border-radius: 4px;">Sort: Najpierw droższe</span>{% endif %}
+                    {% if f.category %}<span class="badge bg-light text-dark">Kategoria: {{ f.category }}</span>{% endif %}
+                    {% if f.transmission %}<span class="badge bg-light text-dark">Skrzynia: {{ f.transmission }}</span>{% endif %}
+                    {% if f.make %}<span class="badge bg-light text-dark">Marka: {{ f.make }}</span>{% endif %}
+                    {% if f.model %}<span class="badge bg-light text-dark">Model: {{ f.model }}</span>{% endif %}
+                    {% if f.seats %}<span class="badge bg-light text-dark">Miejsca: {{ f.seats }}</span>{% endif %}
+                    {% if f.max_price %}<span class="badge bg-light text-dark">Max cena: {{ f.max_price }}</span>{% endif %}
+                    {% if f.sort and f.sort != 'price_asc' %}<span class="badge bg-light text-dark">Sort: Najpierw droższe</span>{% endif %}
 
-                    <a href="/offers" style="margin-left: auto; padding: 0.5rem 0.75rem; background: #dc3545; color: #fff; text-decoration: none; border-radius: 4px;">Wyczyść filtry</a>
+                    <a href="/offers" class="btn btn-sm btn-danger ms-auto">Wyczyść filtry</a>
                 </div>
             {% endif %}
 
             {# Wyniki #}
-            {% if requireDates %}
-                <p>Ustaw najpierw daty, aby zobaczyć dostępne pojazdy.</p>
-            {% else %}
-                {% if cars is empty %}
-                    <p>Brak wyników dla wybranych warunków.</p>
-                {% else %}
-                    <div class="row">
-                        {% for car in cars %}
-                            <div class="col-md-6 col-lg-4 mb-4">
-                                {% include 'partials/offer/_card.twig' with { car: car } %}
-                            </div>
-                        {% endfor %}
+            {% if cars is empty %}
+                <div class="text-center py-5">
+                    <div class="alert alert-warning" role="alert">
+                        <h4 class="alert-heading">Brak dostępnych pojazdów</h4>
+                        <p class="mb-0">W wybranym terminie nie ma dostępnych pojazdów spełniających kryteria wyszukiwania.</p>
                     </div>
-                {% endif %}
+                </div>
+            {% else %}
+                <div class="row g-4">
+                    {% for car in cars %}
+                        <div class="col-md-6 col-lg-4">
+                            {% include 'partials/offer/_card.twig' with { car: car } %}
+                        </div>
+                    {% endfor %}
+                </div>
             {% endif %}
         </div>
     </section>
