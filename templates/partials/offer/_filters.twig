@@ -1,11 +1,10 @@
-<div class="search-filters" style="background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+<div class="search-filters">
     {% set f = filters|default({}) %}
     {% set d = dates|default({}) %}
-    <form method="GET" action="/offers" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-
-        <div>
-            <label for="category" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Kategoria</label>
-            <select id="category" name="category" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
+    <form method="GET" action="/offers" class="row g-3">
+        <div class="col-md-6 col-lg-4">
+            <label for="category" class="form-label fw-bold">Kategoria</label>
+            <select id="category" name="category" class="form-select">
                 <option value="" {{ (f.category is not defined or f.category == '') ? 'selected' : '' }}>Wszystkie kategorie</option>
                 <option value="Osobowy" {{ (f.category is defined and f.category == 'Osobowy') ? 'selected' : '' }}>Osobowy</option>
                 <option value="SUV" {{ (f.category is defined and f.category == 'SUV') ? 'selected' : '' }}>SUV</option>
@@ -13,17 +12,17 @@
                 <option value="Sportowy" {{ (f.category is defined and f.category == 'Sportowy') ? 'selected' : '' }}>Sportowy</option>
             </select>
         </div>
-        <div>
-            <label for="transmission" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Skrzynia biegów</label>
-            <select id="transmission" name="transmission" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
+        <div class="col-md-6 col-lg-4">
+            <label for="transmission" class="form-label fw-bold">Skrzynia biegów</label>
+            <select id="transmission" name="transmission" class="form-select">
                 <option value="" {{ (f.transmission is not defined or f.transmission == '') ? 'selected' : '' }}>Wszystkie</option>
                 <option value="Manual" {{ (f.transmission is defined and f.transmission == 'Manual') ? 'selected' : '' }}>Manualna</option>
                 <option value="Automatic" {{ (f.transmission is defined and f.transmission == 'Automatic') ? 'selected' : '' }}>Automatyczna</option>
             </select>
         </div>
-        <div>
-            <label for="make" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Marka</label>
-            <select id="make" name="make" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
+        <div class="col-md-6 col-lg-4">
+            <label for="make" class="form-label fw-bold">Marka</label>
+            <select id="make" name="make" class="form-select">
                 <option value="" {{ (f.make is not defined or f.make == '') ? 'selected' : '' }}>Wszystkie</option>
                 {% if makes is defined %}
                     {% for m in makes %}
@@ -32,9 +31,9 @@
                 {% endif %}
             </select>
         </div>
-        <div>
-            <label for="model" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Model</label>
-            <select id="model" name="model" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
+        <div class="col-md-6 col-lg-4">
+            <label for="model" class="form-label fw-bold">Model</label>
+            <select id="model" name="model" class="form-select">
                 <option value="" {{ (f.model is not defined or f.model == '') ? 'selected' : '' }}>Wszystkie</option>
                 {% if models is defined %}
                     {% for mm in models %}
@@ -43,9 +42,9 @@
                 {% endif %}
             </select>
         </div>
-        <div>
-            <label for="seats" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Liczba miejsc</label>
-            <select id="seats" name="seats" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
+        <div class="col-md-6 col-lg-4">
+            <label for="seats" class="form-label fw-bold">Liczba miejsc</label>
+            <select id="seats" name="seats" class="form-select">
                 <option value="" {{ (f.seats is not defined or f.seats == '') ? 'selected' : '' }}>Dowolna</option>
                 {% if seatsOptions is defined %}
                     {% for s in seatsOptions %}
@@ -54,19 +53,21 @@
                 {% endif %}
             </select>
         </div>
-        <div>
-            <label for="max_price" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Maksymalna cena dzienna</label>
-            <input type="number" id="max_price" name="max_price" placeholder="np. 200" value="{{ f.max_price is defined ? f.max_price : '' }}" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
+        <div class="col-md-6 col-lg-4">
+            <label for="max_price" class="form-label fw-bold">Maksymalna cena dzienna</label>
+            <input type="number" id="max_price" name="max_price" placeholder="np. 200" value="{{ f.max_price is defined ? f.max_price : '' }}" class="form-control">
         </div>
-        <div>
-            <label for="sort" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Sortowanie</label>
-            <select id="sort" name="sort" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
+        <div class="col-md-6 col-lg-4">
+            <label for="sort" class="form-label fw-bold">Sortowanie</label>
+            <select id="sort" name="sort" class="form-select">
                 <option value="price_asc" {{ (f.sort is not defined or f.sort == 'price_asc') ? 'selected' : '' }}>Cena: od najniższej</option>
                 <option value="price_desc" {{ (f.sort is defined and f.sort == 'price_desc') ? 'selected' : '' }}>Cena: od najwyższej</option>
             </select>
         </div>
-        <div style="display: flex; align-items: end;">
-            <button type="submit" style="width: 100%; padding: 0.75rem; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Szukaj</button>
+        <div class="col-md-6 col-lg-4 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-search me-2"></i>Szukaj
+            </button>
         </div>
     </form>
 </div>

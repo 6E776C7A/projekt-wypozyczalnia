@@ -1,6 +1,6 @@
-<header style="background-color: #333; color: white; padding: 1rem 0;">
+<header class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
     <div class="container">
-        <nav style="display: flex; justify-content: space-between; align-items: center;">
+        <nav class="navbar-nav w-100 d-flex justify-content-between align-items-center">
             {# Zbuduj URL do /offers z zachowaniem dat jeśli dostępne #}
             {% set df = dates.from is defined and dates.from ? dates.from : null %}
             {% set dt = dates.to is defined and dates.to ? dates.to : null %}
@@ -9,12 +9,14 @@
                 {% set offersUrl = '/offers?date_from=' ~ df ~ '&date_to=' ~ dt %}
             {% endif %}
             {% if current_path == '/' %}
-                <span style="color: white; font-size: 1.5rem; font-weight: bold; cursor: default; opacity: .8;">Leasing Pro</span>
+                <span class="navbar-brand mb-0 h1 text-white-50">Leasing Pro</span>
             {% else %}
-                <a href="{{ offersUrl }}" style="color: white; text-decoration: none; font-size: 1.5rem; font-weight: bold;">Leasing Pro</a>
+                <a href="{{ offersUrl }}" class="navbar-brand mb-0 h1 text-white text-decoration-none">Leasing Pro</a>
             {% endif %}
-            <ul style="list-style: none; display: flex; gap: 2rem; margin: 0; padding: 0;">
-                <li><a href="/admin" style="color: white; text-decoration: none;">Panel admina</a></li>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a href="/admin" class="nav-link text-white">Panel admina</a>
+                </li>
             </ul>
         </nav>
     </div>

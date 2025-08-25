@@ -1,434 +1,289 @@
-/* Podstawowe style */
+/* Custom Bootstrap overrides and enhancements */
+:root {
+    --bs-primary: #667eea;
+    --bs-primary-rgb: 102, 126, 234;
+    --bs-secondary: #764ba2;
+    --bs-secondary-rgb: 118, 75, 162;
+}
+
+/* Custom background gradient for body */
+body {
+    background: linear-gradient(135deg, #eef1ff 0%, #f8f9ff 50%, #ffffff 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Ensure main content takes full height */
+main {
+    flex: 1 0 auto;
+    min-height: calc(100vh - 200px); /* Adjust based on header/footer height */
+}
+
+/* Enhanced card shadows */
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+}
+
+/* Custom button styles */
+.btn-primary {
+    background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-secondary) 100%);
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #c82333 0%, #a71e2a 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+}
+
+/* Enhanced form controls */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+}
+
+/* Custom navbar styling */
+.navbar-dark {
+    background: linear-gradient(135deg, #333 0%, #555 100%) !important;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* Enhanced badges */
+.badge {
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+/* Custom alert styling */
+.alert {
+    border: none;
+    border-radius: 12px;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+}
+
+.alert-warning {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    color: #856404;
+}
+
+.alert-info {
+    background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+    color: #0c5460;
+}
+
+/* Enhanced price display */
+.text-success {
+    color: #28a745 !important;
+}
+
+.text-primary {
+    color: var(--bs-primary) !important;
+}
+
+/* Custom footer styling */
+footer {
+    background: linear-gradient(135deg, #333 0%, #555 100%) !important;
+    margin-top: auto !important;
+    flex-shrink: 0;
+}
+
+/* Responsive image handling */
+.card-img-top {
+    transition: transform 0.3s ease;
+}
+
+.card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+/* Enhanced spacing for mobile */
+@media (max-width: 768px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    .card-body {
+        padding: 1.25rem;
+    }
+    
+    /* Ensure mobile pages also fill full height */
+    main {
+        min-height: calc(100vh - 150px);
+    }
+}
+
+/* Custom reCAPTCHA styling */
+.g-recaptcha {
+    margin: 0 auto;
+}
+
+/* Enhanced typography */
+.display-4 {
+    font-weight: 700;
+}
+
+.display-3 {
+    font-weight: 700;
+}
+
+.fw-bold {
+    font-weight: 700 !important;
+}
+
+/* Custom card borders */
+.card {
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+/* Enhanced button groups */
+.btn-group .btn {
+    border-radius: 8px;
+}
+
+/* Custom form layout */
+.form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+/* Enhanced navigation */
+.nav-link {
+    transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+    transform: translateY(-1px);
+}
+
+/* Custom shadows */
+.shadow-sm {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+}
+
+.shadow {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.shadow-lg {
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important;
+}
+
+/* Enhanced grid system */
+.row.g-4 > * {
+    padding: 0.75rem;
+}
+
+/* Custom button sizes */
+.btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 1.1rem;
+    border-radius: 10px;
+}
+
+.btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    border-radius: 6px;
+}
+
+/* Enhanced form validation */
+.was-validated .form-control:valid,
+.form-control.is-valid {
+    border-color: #28a745;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+}
+
+.was-validated .form-control:invalid,
+.form-control.is-invalid {
+    border-color: #dc3545;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%23dc3545' viewBox='-2 -2 7 7'%3e%3cpath stroke='%23dc3545' d='M0 0l3 3m0-3L0 3'/%3e%3ccircle r='.5'/%3e%3ccircle cx='3' r='.5'/%3e%3ccircle cy='3' r='.5'/%3e%3ccircle cx='3' cy='3' r='.5'/%3e%3c/svg%3E");
+}
+
+/* Full height sections */
+.min-vh-100 {
+    min-height: 100vh !important;
+}
+
+/* Ensure no white spaces */
+html, body {
+    overflow-x: hidden;
+    height: 100%;
+}
+
+/* Hero section improvements */
+.bg-primary {
+    background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-secondary) 100%) !important;
+}
+
+/* Card improvements for hero section */
+.card.shadow-lg {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+/* Additional footer positioning */
+.site-footer {
+    margin-top: auto !important;
+}
+
+/* Ensure content fills available space */
+.flex-grow-1 {
+    flex-grow: 1 !important;
+}
+
+/* Remove any default margins that might cause white spaces */
 * {
     box-sizing: border-box;
 }
 
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    /* Globalne tło gradientowe dla wszystkich stron */
-    background: linear-gradient(135deg, #eef1ff 0%, #f8f9ff 50%, #ffffff 100%);
-    background-attachment: fixed;
-}
-
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
-}
-
-/* Style dla strony głównej */
-.hero-section {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 4rem 0;
-}
-
-.hero-section h1 {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-    font-weight: 300;
-}
-
-.hero-section .lead {
-    font-size: 1.25rem;
-    margin-bottom: 2rem;
-    opacity: 0.9;
-}
-
-.date-selection-form {
-    background: white;
-    padding: 2rem;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    margin-top: 2rem;
-}
-
-.date-selection-form h3 {
-    color: #333;
-    margin-bottom: 1rem;
-}
-
-.date-selection-form .text-muted {
-    color: #6c757d !important;
-}
-
-.form-control {
-    border: 2px solid #e9ecef;
-    border-radius: 8px;
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-}
-
-.form-control:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-    outline: 0;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-    border-radius: 8px;
-    padding: 0.75rem 1.5rem;
-    font-weight: 600;
-    transition: transform 0.2s ease-in-out;
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-}
-
-.btn-outline-primary {
-    border: 2px solid #667eea;
-    color: #667eea;
-    background: transparent;
-    border-radius: 8px;
-    padding: 0.75rem 1.5rem;
-    font-weight: 600;
-    transition: all 0.2s ease-in-out;
-}
-
-.btn-outline-primary:hover {
-    background: #667eea;
-    color: white;
-    transform: translateY(-2px);
-}
-
-/* Style dla sekcji "Jak to działa" */
-.how-it-works-section {
-    background: white;
-    padding: 4rem 0;
-}
-
-.how-it-works-section h2 {
-    color: #333;
-    margin-bottom: 3rem;
-}
-
-.step-icon {
-    margin-bottom: 1.5rem;
-}
-
-.step-icon i {
-    color: #667eea;
-}
-
-.how-it-works-section h4 {
-    color: #333;
-    margin-bottom: 1rem;
-}
-
-.how-it-works-section p {
-    color: #6c757d;
-    line-height: 1.6;
-}
-
-/* Style dla formularzy */
-.car-form {
-    background: white;
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    margin-bottom: 2rem;
-}
-
-.car-form div {
-    margin-bottom: 1rem;
-}
-
-.car-form label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: bold;
-}
-
-.car-form input,
-.car-form select {
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 1rem;
-}
-
-.car-form button {
-    background-color: #007bff;
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-}
-
-.car-form button:hover {
-    background-color: #0056b3;
-}
-
-/* Style dla formularza logowania */
-.login-form {
-    max-width: 400px;
-    margin: 50px auto;
-    padding: 2rem;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-
-.login-form h1 {
-    text-align: center;
-    margin-bottom: 2rem;
-    color: #333;
-}
-
-.login-form input {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 1rem;
-    margin-bottom: 1rem;
-}
-
-.login-form button {
-    width: 100%;
-    padding: 0.75rem;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 1rem;
-    cursor: pointer;
-}
-
-.login-form button:hover {
-    background-color: #0056b3;
-}
-
-/* Style dla panelu administratora */
-.admin-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #eee;
-}
-
-.admin-user-info {
+/* Ensure sections take full height */
+section.min-vh-100 {
     display: flex;
     align-items: center;
-    gap: 1rem;
 }
 
-.logout-button {
-    background-color: #dc3545;
-    color: white;
-    padding: 0.5rem 1rem;
-    text-decoration: none;
-    border-radius: 5px;
-    font-size: 0.875rem;
-}
-
-.logout-button:hover {
-    background-color: #c82333;
-}
-
-/* Style dla tabel */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-
-th, td {
-    padding: 1rem;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-}
-
-th {
-    background-color: #f8f9fa;
-    font-weight: bold;
-}
-
-.button-delete {
-    background-color: #dc3545;
-    color: white;
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.button-delete:hover {
-    background-color: #c82333;
-}
-
-/* Style dla listy samochodów */
-.car-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 2rem;
-    margin-top: 2rem;
-}
-
-.car-item {
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    overflow: hidden;
-    transition: transform 0.2s;
-}
-
-.car-item:hover {
-    transform: translateY(-5px);
-}
-
-.car-item .price {
-    font-weight: bold;
-    color: #28a745;
-}
-
-/* Większe odstępy i ujednolicenie siatki dla listy ofert */
-.offers-list .row {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 2.5rem;
-}
-
-.offers-list .car-card {
-    margin-bottom: 0;
-}
-
-/* Responsywność */
-@media (max-width: 768px) {
-    .car-list {
-        grid-template-columns: 1fr;
-    }
-    .offers-list .row {
-        grid-template-columns: 1fr;
-        gap: 1.25rem;
-    }
-    
-    .container {
-        padding: 0 0.5rem;
-    }
-}
-
-/* Style dla reCAPTCHA */
-.captcha-container {
-    min-height: 100vh;
+/* Container improvements */
+.container.min-vh-100 {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 2rem;
-}
-
-.captcha-form {
-    background: white;
-    padding: 3rem;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    text-align: center;
-    max-width: 500px;
-    width: 100%;
-}
-
-.captcha-form h1 {
-    color: #333;
-    margin-bottom: 1rem;
-    font-size: 2rem;
-}
-
-.captcha-form p {
-    color: #666;
-    margin-bottom: 2rem;
-    font-size: 1.1rem;
-    line-height: 1.6;
-}
-
-.captcha-error {
-    background-color: #f8d7da;
-    color: #721c24;
-    padding: 1rem;
-    border-radius: 5px;
-    border: 1px solid #f5c6cb;
-    margin-bottom: 1.5rem;
-}
-
-.captcha-button {
-    background-color: #007bff;
-    color: white;
-    padding: 1rem 2rem;
-    border: none;
-    border-radius: 5px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    margin-top: 1rem;
-    transition: background-color 0.2s;
-}
-
-.captcha-button:hover {
-    background-color: #0056b3;
-}
-
-.captcha-button:disabled {
-    background-color: #6c757d;
-    cursor: not-allowed;
-}
-
-/* Responsywność dla reCAPTCHA */
-@media (max-width: 768px) {
-    .captcha-container {
-        padding: 1rem;
-    }
-    
-    .captcha-form {
-        padding: 2rem;
-    }
-    
-    .captcha-form h1 {
-        font-size: 1.5rem;
-    }
-}
-
-/* Ukryj komunikat testowy reCAPTCHA */
-.grecaptcha-badge {
-    visibility: hidden !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    display: none !important;
-}
-
-/* Ukryj tekst "This reCAPTCHA is for testing purposes only" */
-.grecaptcha-badge .grecaptcha-error {
-    display: none !important;
-}
-
-/* Ukryj wszystkie elementy z tekstem "testing purposes" */
-*:contains("testing purposes") {
-    display: none !important;
-}
-
-/* Ukryj elementy z tekstem "test" */
-*:contains("test") {
-    display: none !important;
-}
-
-/* Ukryj elementy z klasą grecaptcha */
-.grecaptcha-badge,
-.grecaptcha-error,
-.grecaptcha-info {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
 }

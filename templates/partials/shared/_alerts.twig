@@ -1,16 +1,22 @@
 {% if status %}
-    <div class="container" style="margin-top: 1rem;">
+    <div class="container mt-3">
         {% if status == 'added' %}
-            <div style="background-color: #d4edda; color: #155724; padding: 1rem; border-radius: 5px; border: 1px solid #c3e6cb;">
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i>
                 Samochód został pomyślnie dodany!
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         {% elseif status == 'deleted' %}
-            <div style="background-color: #d4edda; color: #155724; padding: 1rem; border-radius: 5px; border: 1px solid #c3e6cb;">
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i>
                 Samochód został pomyślnie usunięty!
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         {% elseif status == 'error' %}
-            <div style="background-color: #f8d7da; color: #721c24; padding: 1rem; border-radius: 5px; border: 1px solid #f5c6cb;">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
                 Wystąpił błąd podczas dodawania samochodu. Sprawdź czy wszystkie pola są wypełnione poprawnie.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         {% endif %}
     </div>

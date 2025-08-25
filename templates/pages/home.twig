@@ -4,58 +4,61 @@
 
 {% block content %}
     {# Sekcja "Hero" z głównym hasłem i wyszukiwarką #}
-    <section class="hero-section text-center py-5">
-        <h1 style="text-align: center;">Samochód w abonamencie lub leasingu. Prościej się nie da.</h1>
-        <p class="lead" style="text-align: center;">Wybierz auto, dopasuj ratę i odbierz kluczyki.</p>
-        
-        <div class="container mt-4">
+    <section class="bg-primary text-white d-flex align-items-center min-vh-100">
+        <div class="container">
             <div class="row justify-content-center">
-                <div class="col-md-8">
-                    <div class="date-selection-form" style="background: #f8f9fa; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-                        <h3 class="mb-4">Wybierz termin wypożyczenia</h3>
-                        <p class="text-muted mb-4">Ustaw datę rozpoczęcia i zakończenia, aby zobaczyć dostępne pojazdy</p>
-                        
-                        <form method="GET" action="/offers" class="row g-3">
-                            <div class="col-md-5">
-                                <label for="date_from" class="form-label fw-bold" style="color: black;">Data od</label>
-                                <input type="date" 
-                                       id="date_from" 
-                                       name="date_from" 
-                                       class="form-control form-control-lg" 
-                                       required 
-                                       min="{{ "now"|date("Y-m-d") }}"
-                                       value="{{ dates.from|default('') }}">
-                            </div>
-                            <div class="col-md-5">
-                                <label for="date_to" class="form-label fw-bold" style="color: black;">Data do</label>
-                                <input type="date" 
-                                       id="date_to" 
-                                       name="date_to" 
-                                       class="form-control form-control-lg" 
-                                       required 
-                                       min="{{ "now"|date("Y-m-d") }}"
-                                       value="{{ dates.to|default('') }}">
-                            </div>
-                            <div class="col-md-2 d-flex align-items-end" style="margin-left: 0.75rem; margin-top: 0.5rem;">
-                                <button type="submit" class="btn btn-primary btn-lg w-100">
-                                    Szukaj
-                                </button>
-                            </div>
-                        </form>
-                        
-                        {% if date_error %}
-                            <div class="alert alert-warning mt-3 auto-hide" role="alert" data-hide-delay="8000">
-                                {% if date_error == 'Data_początkowa_nie_może_być_w_przeszłości' %}
-                                    <strong>Błąd:</strong> Data początkowa nie może być w przeszłości. Wybierz datę od dzisiaj.
-                                {% elseif date_error == 'Data_końcowa_musi_być_późniejsza_niż_początkowa' %}
-                                    <strong>Błąd:</strong> Data końcowa musi być późniejsza niż początkowa.
-                                {% elseif date_error == 'Wybierz_poprawny_termin_wypożyczenia' %}
-                                    <strong>Błąd:</strong> Wybierz poprawny termin wypożyczenia.
-                                {% else %}
-                                    {{ date_error }}
-                                {% endif %}
-                            </div>
-                        {% endif %}
+                <div class="col-lg-8 text-center">
+                    <h1 class="display-3 fw-bold mb-4">Samochód w abonamencie lub leasingu. Prościej się nie da.</h1>
+                    <p class="lead mb-5 fs-4">Wybierz auto, dopasuj ratę i odbierz kluczyki.</p>
+                    
+                    <div class="card border-0 shadow-lg">
+                        <div class="card-body p-5">
+                            <h3 class="card-title mb-4 text-dark">Wybierz termin wypożyczenia</h3>
+                            <p class="text-muted mb-4">Ustaw datę rozpoczęcia i zakończenia, aby zobaczyć dostępne pojazdy</p>
+                            
+                            <form method="GET" action="/offers" class="row g-3">
+                                <div class="col-md-5">
+                                    <label for="date_from" class="form-label fw-bold text-dark">Data od</label>
+                                    <input type="date" 
+                                           id="date_from" 
+                                           name="date_from" 
+                                           class="form-control form-control-lg" 
+                                           required 
+                                           min="{{ "now"|date("Y-m-d") }}"
+                                           value="{{ dates.from|default('') }}">
+                                </div>
+                                <div class="col-md-5">
+                                    <label for="date_to" class="form-label fw-bold text-dark">Data do</label>
+                                    <input type="date" 
+                                           id="date_to" 
+                                           name="date_to" 
+                                           class="form-control form-control-lg" 
+                                           required 
+                                           min="{{ "now"|date("Y-m-d") }}"
+                                           value="{{ dates.to|default('') }}">
+                                </div>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary btn-lg w-100">
+                                        <i class="bi bi-search me-2"></i>Szukaj
+                                    </button>
+                                </div>
+                            </form>
+                            
+                            {% if date_error %}
+                                <div class="alert alert-warning mt-4" role="alert">
+                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                    {% if date_error == 'Data_początkowa_nie_może_być_w_przeszłości' %}
+                                        <strong>Błąd:</strong> Data początkowa nie może być w przeszłości. Wybierz datę od dzisiaj.
+                                    {% elseif date_error == 'Data_końcowa_musi_być_późniejsza_niż_początkowa' %}
+                                        <strong>Błąd:</strong> Data końcowa musi być późniejsza niż początkowa.
+                                    {% elseif date_error == 'Wybierz_poprawny_termin_wypożyczenia' %}
+                                        <strong>Błąd:</strong> Wybierz poprawny termin wypożyczenia.
+                                    {% else %}
+                                        {{ date_error }}
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -85,22 +88,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const today = new Date().toISOString().split('T')[0];
     dateFrom.min = today;
     dateTo.min = today;
-    
-    // Auto-hide dla komunikatów błędów
-    const autoHideAlerts = document.querySelectorAll('.auto-hide');
-    
-    autoHideAlerts.forEach(function(alert) {
-        const delay = parseInt(alert.getAttribute('data-hide-delay')) || 8000;
-        
-        setTimeout(function() {
-            alert.style.transition = 'opacity 0.5s ease-out';
-            alert.style.opacity = '0';
-            
-            setTimeout(function() {
-                alert.style.display = 'none';
-            }, 500);
-        }, delay);
-    });
 });
 </script>
 {% endblock %}

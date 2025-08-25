@@ -3,84 +3,144 @@
 {% block title %}Szczegóły oferty | {{ parent() }}{% endblock %}
 
 {% block content %}
-<section class="offer-detail py-5">
+<section class="py-5 min-vh-100">
     <div class="container">
-        <h1 class="mb-4">{{ car.make }} {{ car.model }}</h1>
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card shadow-lg border-0">
+                    <div class="card-body p-5">
+                        <h1 class="text-center mb-4 text-primary fw-bold">{{ car.make }} {{ car.model }}</h1>
 
-        {% if status == 'booked' %}
-            <div class="alert alert-success" role="alert" style="background:#d4edda; color:#155724; padding:1rem; border-radius:6px; margin-bottom:1rem;">
-                Rezerwacja przyjęta! Potwierdzenie wysłano na podany e-mail.
-            </div>
-        {% elseif status == 'invalid_form' %}
-            <div class="alert alert-danger" role="alert" style="background:#f8d7da; color:#721c24; padding:1rem; border-radius:6px; margin-bottom:1rem;">
-                Uzupełnij poprawnie dane (imię, nazwisko, e-mail).
-            </div>
-        {% elseif status == 'invalid_dates' %}
-            <div class="alert alert-warning" role="alert" style="background:#fff3cd; color:#856404; padding:1rem; border-radius:6px; margin-bottom:1rem;">
-                Nieprawidłowy zakres dat. Wróć do listy i ustaw termin.
-            </div>
-        {% elseif status == 'unavailable' %}
-            <div class="alert alert-warning" role="alert" style="background:#fff3cd; color:#856404; padding:1rem; border-radius:6px; margin-bottom:1rem;">
-                Niestety w wybranym terminie pojazd jest niedostępny.
-            </div>
-        {% elseif status == 'captcha_error' %}
-            <div class="alert alert-danger" role="alert" style="background:#f8d7da; color:#721c24; padding:1rem; border-radius:6px; margin-bottom:1rem;">
-                Proszę zaznaczyć reCAPTCHA przed złożeniem rezerwacji.
-            </div>
-        {% endif %}
+                        {% if status == 'booked' %}
+                            <div class="alert alert-success" role="alert">
+                                <i class="bi bi-check-circle-fill me-2"></i>
+                                Rezerwacja przyjęta! Potwierdzenie wysłano na podany e-mail.
+                            </div>
+                        {% elseif status == 'invalid_form' %}
+                            <div class="alert alert-danger" role="alert">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                Uzupełnij poprawnie dane (imię, nazwisko, e-mail).
+                            </div>
+                        {% elseif status == 'invalid_dates' %}
+                            <div class="alert alert-warning" role="alert">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                Nieprawidłowy zakres dat. Wróć do listy i ustaw termin.
+                            </div>
+                        {% elseif status == 'unavailable' %}
+                            <div class="alert alert-warning" role="alert">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                Niestety w wybranym terminie pojazd jest niedostępny.
+                            </div>
+                        {% elseif status == 'captcha_error' %}
+                            <div class="alert alert-danger" role="alert">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                Proszę zaznaczyć reCAPTCHA przed złożeniem rezerwacji.
+                            </div>
+                        {% endif %}
 
-        <div class="row">
-            <div class="col-md-6">
-                {% if car.image_url %}
-                    <img src="{{ car.image_url }}" alt="{{ car.make }} {{ car.model }}" style="width:100%; border-radius:8px; object-fit:cover; max-height:360px;">
-                {% else %}
-                    <div style="width:100%; height:360px; background:#f1f3f5; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#6c757d;">Brak zdjęcia</div>
-                {% endif %}
-            </div>
-            <div class="col-md-6">
-                <ul style="list-style:none; padding:0; margin:0 0 1rem 0;">
-                    <li><strong>Kategoria:</strong> {{ car.category }}</li>
-                    <li><strong>Skrzynia biegów:</strong> {{ car.transmission }}</li>
-                    <li><strong>Miejsca:</strong> {{ car.seats }}</li>
-                    <li><strong>Doba (dni robocze):</strong> {{ car.workday_price|number_format(2, ',', ' ') }} zł</li>
-                    <li><strong>Doba (weekend):</strong> {{ car.weekend_price|number_format(2, ',', ' ') }} zł</li>
-                </ul>
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="position-relative">
+                                    {% if car.image_url %}
+                                        <img src="{{ car.image_url }}" alt="{{ car.make }} {{ car.model }}" class="img-fluid rounded-3 shadow">
+                                    {% else %}
+                                        <div class="bg-light rounded-3 d-flex align-items-center justify-content-center" style="height: 300px;">
+                                            <div class="text-muted text-center">
+                                                <i class="bi bi-image display-4"></i>
+                                                <p class="mt-2">Brak zdjęcia</p>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="card bg-light border-0 mb-4">
+                                    <div class="card-body">
+                                        <h5 class="card-title mb-3">
+                                            <i class="bi bi-info-circle me-2"></i>Specyfikacja pojazdu
+                                        </h5>
+                                        <ul class="list-unstyled mb-0">
+                                            <li class="d-flex justify-content-between py-2 border-bottom">
+                                                <strong>Kategoria:</strong>
+                                                <span class="badge bg-primary">{{ car.category }}</span>
+                                            </li>
+                                            <li class="d-flex justify-content-between py-2 border-bottom">
+                                                <strong>Skrzynia biegów:</strong>
+                                                <span class="badge bg-secondary">{{ car.transmission }}</span>
+                                            </li>
+                                            <li class="d-flex justify-content-between py-2 border-bottom">
+                                                <strong>Miejsca:</strong>
+                                                <span class="badge bg-info">{{ car.seats }}</span>
+                                            </li>
+                                            <li class="d-flex justify-content-between py-2 border-bottom">
+                                                <strong>Doba (dni robocze):</strong>
+                                                <span class="text-success fw-bold">{{ car.workday_price|number_format(2, ',', ' ') }} zł</span>
+                                            </li>
+                                            <li class="d-flex justify-content-between py-2">
+                                                <strong>Doba (weekend):</strong>
+                                                <span class="text-primary fw-bold">{{ car.weekend_price|number_format(2, ',', ' ') }} zł</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
 
-                <div style="background:#f8f9fa; padding:1rem; border-radius:8px; margin-bottom:1rem;">
-                    <p style="margin:0 0 .25rem 0;">Termin: <strong>{{ dates.from }}</strong> — <strong>{{ dates.to }}</strong></p>
-                    {% if total_price is not null %}
-                        <p style="margin:0;">Cena za cały termin: <strong>{{ total_price|number_format(2, ',', ' ') }} zł</strong></p>
-                    {% endif %}
-                </div>
+                                <div class="card bg-primary text-white border-0 mb-4">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title mb-3">
+                                            <i class="bi bi-calculator me-2"></i>Podsumowanie ceny
+                                        </h5>
+                                        <p class="mb-2">Termin: <strong>{{ dates.from }}</strong> — <strong>{{ dates.to }}</strong></p>
+                                        {% if total_price is not null %}
+                                            <div class="total-price">{{ total_price|number_format(2, ',', ' ') }} zł</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
 
-                <h3 class="h5 mb-3">Dane wypożyczającego</h3>
-                <form method="POST" action="/offers/{{ car.id }}/book" style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
-                    <div style="grid-column: span 1;">
-                        <label for="first_name" style="display:block; margin-bottom:.5rem;">Imię</label>
-                        <input type="text" id="first_name" name="first_name" required style="width:100%; padding:.5rem; border:1px solid #ddd; border-radius:5px;">
-                    </div>
-                    <div style="grid-column: span 1;">
-                        <label for="last_name" style="display:block; margin-bottom:.5rem;">Nazwisko</label>
-                        <input type="text" id="last_name" name="last_name" required style="width:100%; padding:.5rem; border:1px solid #ddd; border-radius:5px;">
-                    </div>
-                    <div style="grid-column: span 2;">
-                        <label for="email" style="display:block; margin-bottom:.5rem;">E-mail</label>
-                        <input type="email" id="email" name="email" required style="width:100%; padding:.5rem; border:1px solid #ddd; border-radius:5px;">
-                    </div>
-                    
-                    {# reCAPTCHA #}
-                    <div style="grid-column: span 2; margin: 1rem 0;">
-                        <div class="captcha-container">
-                            <p class="text-muted mb-2"><small>Przed złożeniem rezerwacji, potwierdź że nie jesteś robotem:</small></p>
-                            <div id="g-recaptcha" class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"></div>
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <h5 class="card-title mb-3">
+                                            <i class="bi bi-person-fill me-2"></i>Dane wypożyczającego
+                                        </h5>
+                                        <form method="POST" action="/offers/{{ car.id }}/book">
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <label for="first_name" class="form-label">Imię</label>
+                                                    <input type="text" class="form-control" id="first_name" name="first_name" required>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="last_name" class="form-label">Nazwisko</label>
+                                                    <input type="text" class="form-control" id="last_name" name="last_name" required>
+                                                </div>
+                                                <div class="col-12">
+                                                    <label for="email" class="form-label">E-mail</label>
+                                                    <input type="email" class="form-control" id="email" name="email" required>
+                                                </div>
+                                                
+                                                <div class="col-12 text-center">
+                                                    <p class="text-muted small mb-2">
+                                                        <i class="bi bi-shield-check me-1"></i>
+                                                        Przed złożeniem rezerwacji, potwierdź że nie jesteś robotem:
+                                                    </p>
+                                                    <div id="g-recaptcha" class="g-recaptcha d-inline-block" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"></div>
+                                                </div>
+                                                
+                                                <div class="col-12 d-flex gap-3">
+                                                    <a href="/offers" class="btn btn-secondary flex-fill">
+                                                        <i class="bi bi-arrow-left me-2"></i>Wróć
+                                                    </a>
+                                                    <button type="submit" class="btn btn-primary flex-fill">
+                                                        <i class="bi bi-check-circle me-2"></i>Zarezerwuj
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div style="grid-column: span 2; display:flex; gap:.75rem;">
-                        <a href="/offers" style="padding:.75rem 1rem; background:#6c757d; color:#fff; text-decoration:none; border-radius:5px;">Wróć</a>
-                        <button type="submit" class="btn btn-primary" style="padding:.75rem 1rem; background:#007bff; color:#fff; border:none; border-radius:5px; cursor:pointer;">Zarezerwuj</button>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
