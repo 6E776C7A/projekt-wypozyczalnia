@@ -120,6 +120,9 @@ $twig = new \Twig\Environment($loader, [
     'auto_reload' => true
 ]);
 
+// Inicjalizacja BookingService (logika kalkulacji ceny)
+$bookingService = new \App\Service\BookingService();
+
 // Krok 4: Inicjalizacja połączenia z bazą danych (PDO)
 try {
     $pdo = new PDO('sqlite:' . DB_PATH);
@@ -131,6 +134,9 @@ try {
 // Krok 5: NOWY, LEPSZY ROUTER (obsługa "ładnych adresów")
 $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $requestMethod = $_SERVER['REQUEST_METHOD'];
+
+// Udostępnij bieżącą ścieżkę w szablonach
+$twig->addGlobal('current_path', $requestUri);
 
 // Dynamiczne trasy dla ofert: szczegóły i rezerwacja
 if (preg_match('#^/offers/(\d+)$#', $requestUri, $matches)) {
@@ -156,7 +162,7 @@ if (preg_match('#^/offers/(\d+)$#', $requestUri, $matches)) {
         $df = date_create($dateFrom);
         $dt = date_create($dateTo);
         if ($df && $dt && $dateFrom <= $dateTo) {
-            $totalPrice = calculateTotalRentalCost($dateFrom, $dateTo, (float)$car['workday_price'], (float)$car['weekend_price']);
+            $totalPrice = $bookingService->calculatePrice($dateFrom, $dateTo, (float)$car['workday_price'], (float)$car['weekend_price']);
         }
     }
 
@@ -219,7 +225,7 @@ if ($requestMethod === 'POST' && preg_match('#^/offers/(\d+)/book$#', $requestUr
     }
 
     // Oblicz koszt i zapisz rezerwację
-    $totalCost = calculateTotalRentalCost($dateFrom, $dateTo, (float)$car['workday_price'], (float)$car['weekend_price']);
+    $totalCost = $bookingService->calculatePrice($dateFrom, $dateTo, (float)$car['workday_price'], (float)$car['weekend_price']);
     $token = bin2hex(random_bytes(32));
 
     $stmt = $pdo->prepare("INSERT INTO reservations (car_id, start_date, end_date, customer_email, total_cost, cancellation_token) VALUES (:car_id, :start_date, :end_date, :email, :total_cost, :token)");
@@ -260,6 +266,14 @@ switch ($requestUri) {
     // Adres: http://localhost:8080/logout
     case '/logout':
         logout();
+        break;
+
+    // --- TRASA: Reset zakresu dat ---
+    // Adres: http://localhost:8080/reset-dates
+    case '/reset-dates':
+        unset($_SESSION['search_dates']);
+        header('Location: /');
+        exit();
         break;
 
     // --- TRASA: Panel Administratora ---
@@ -484,7 +498,7 @@ switch ($requestUri) {
             foreach ($cars as &$car) {
                 $workday = (float)$car['workday_price'];
                 $weekend = (float)$car['weekend_price'];
-                $car['total_price'] = calculateTotalRentalCost($dateFrom, $dateTo, $workday, $weekend);
+                $car['total_price'] = $bookingService->calculatePrice($dateFrom, $dateTo, $workday, $weekend);
             }
             unset($car);
         }

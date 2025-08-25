@@ -1,0 +1,55 @@
+{% extends 'layouts/base.twig' %}
+
+{% block title %}Potwierdzenie rezerwacji | {{ parent() }}{% endblock %}
+
+{% block content %}
+    <section class="py-5">
+        <div class="container" style="max-width: 900px;">
+            <h1 class="h3 mb-4">Potwierdzenie rezerwacji</h1>
+
+            {% if booking and car %}
+                <div class="card" style="border: 1px solid #e9ecef; border-radius: 8px; overflow: hidden;">
+                    <div class="card-body" style="padding: 1.5rem;">
+                        <h2 class="h5 mb-3">{{ car.make }} {{ car.model }}</h2>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                            <div>
+                                <div style="color: #6c757d;">Data od</div>
+                                <div style="font-weight: 600;">{{ booking.start_date }}</div>
+                            </div>
+                            <div>
+                                <div style="color: #6c757d;">Data do</div>
+                                <div style="font-weight: 600;">{{ booking.end_date }}</div>
+                            </div>
+                            <div>
+                                <div style="color: #6c757d;">Email</div>
+                                <div style="font-weight: 600;">{{ booking.customer_email }}</div>
+                            </div>
+                            <div>
+                                <div style="color: #6c757d;">Całkowity koszt</div>
+                                <div style="font-weight: 700; color: #212529;">{{ booking.total_cost|number_format(2, ',', ' ') }} zł</div>
+                            </div>
+                        </div>
+
+                        <div class="mt-3" style="display: flex; gap: .75rem;">
+                            <a href="/mvc-example" class="btn btn-secondary">Wróć do listy</a>
+
+                            <form method="POST" action="/mvc-example/cancel" style="margin: 0;">
+                                <input type="hidden" name="token" value="{{ booking.cancellation_token }}" />
+                                <button type="submit" class="btn btn-danger" {{ not canCancel ? 'disabled' : '' }}>Anuluj rezerwację</button>
+                            </form>
+                        </div>
+
+                        {% if not canCancel %}
+                            <p class="text-muted mt-2" style="color: #6c757d;">Anulowanie możliwe najpóźniej 48 godzin przed rozpoczęciem.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-danger" role="alert">Nie znaleziono danych rezerwacji.</div>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}
+
+

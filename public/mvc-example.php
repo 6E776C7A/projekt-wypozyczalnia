@@ -69,6 +69,14 @@ if ($requestUri === '/mvc-example') {
 } elseif ($requestUri === '/mvc-example/book' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     // Zarezerwuj samochód
     $carController->bookCar($_POST);
+} elseif ($requestUri === '/mvc-example/confirm' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    // Strona potwierdzenia rezerwacji
+    $token = $_GET['token'] ?? '';
+    $carController->showConfirmationPage($token);
+} elseif ($requestUri === '/mvc-example/cancel' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Anulowanie rezerwacji przez klienta
+    $token = $_POST['token'] ?? '';
+    $carController->cancelBooking($token);
 } else {
     echo "Dostępne endpointy:<br>";
     echo "- GET /mvc-example - Strona główna<br>";

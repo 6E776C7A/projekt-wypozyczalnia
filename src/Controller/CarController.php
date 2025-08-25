@@ -104,21 +104,39 @@ class CarController
 
         $this->carRepository->saveBooking((int)$carId, $email, $firstName, $lastName, $dateFrom, $dateTo, $totalCost, $cancellation_token);
 
-        header('Location: /offers?status=booked');
+        // Przejdź do strony potwierdzenia z tokenem
+        header('Location: /mvc-example/confirm?token=' . urlencode($cancellation_token));
         exit();
     }
 
-    public function showConfirmationPage()
+    public function showConfirmationPage(string $token)
     {
-        echo $this->twig->render('pages/offer/list.twig', [
-            'cars' => [],
-            'dates' => ['from' => '', 'to' => ''],
-            'requireDates' => true,
-            'filters' => [],
-            'makes' => [],
-            'models' => [],
-            'seatsOptions' => [],
-            'status' => 'booked'
+        if (empty($token)) {
+            echo $this->twig->render('pages/static/404.twig', [
+                'error_message' => 'Brak tokenu potwierdzenia.'
+            ]);
+            return;
+        }
+
+        $booking = $this->carRepository->findBookingByToken($token);
+        if (!$booking) {
+            echo $this->twig->render('pages/static/404.twig', [
+                'error_message' => 'Rezerwacja nie została znaleziona.'
+            ]);
+            return;
+        }
+
+        $car = $this->carRepository->findById((int)$booking['car_id']);
+
+        $bookingTimestamp = strtotime($booking['start_date']);
+        $nowTimestamp = time();
+        $hoursUntilStart = ($bookingTimestamp - $nowTimestamp) / 3600;
+        $canCancel = $hoursUntilStart >= 48;
+
+        echo $this->twig->render('pages/offer/confirmation.twig', [
+            'booking' => $booking,
+            'car' => $car,
+            'canCancel' => $canCancel
         ]);
     }
 

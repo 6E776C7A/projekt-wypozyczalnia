@@ -5,8 +5,8 @@
 {% block content %}
     {# Sekcja "Hero" z głównym hasłem i wyszukiwarką #}
     <section class="hero-section text-center py-5">
-        <h1>Samochód w abonamencie lub leasingu. Prościej się nie da.</h1>
-        <p class="lead">Wybierz auto, dopasuj ratę i odbierz kluczyki.</p>
+        <h1 style="text-align: center;">Samochód w abonamencie lub leasingu. Prościej się nie da.</h1>
+        <p class="lead" style="text-align: center;">Wybierz auto, dopasuj ratę i odbierz kluczyki.</p>
         
         <div class="container mt-4">
             <div class="row justify-content-center">
@@ -36,7 +36,7 @@
                                        min="{{ "now"|date("Y-m-d") }}"
                                        value="{{ dates.to|default('') }}">
                             </div>
-                            <div class="col-md-2 d-flex align-items-end">
+                            <div class="col-md-2 d-flex align-items-end" style="margin-left: 0.75rem; margin-top: 0.5rem;">
                                 <button type="submit" class="btn btn-primary btn-lg w-100">
                                     Szukaj
                                 </button>

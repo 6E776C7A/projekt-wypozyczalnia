@@ -1,9 +1,19 @@
 <header style="background-color: #333; color: white; padding: 1rem 0;">
     <div class="container">
         <nav style="display: flex; justify-content: space-between; align-items: center;">
-            <a href="/" style="color: white; text-decoration: none; font-size: 1.5rem; font-weight: bold;">Leasing Pro</a>
+            {# Zbuduj URL do /offers z zachowaniem dat jeśli dostępne #}
+            {% set df = dates.from is defined and dates.from ? dates.from : null %}
+            {% set dt = dates.to is defined and dates.to ? dates.to : null %}
+            {% set offersUrl = '/offers' %}
+            {% if df and dt %}
+                {% set offersUrl = '/offers?date_from=' ~ df ~ '&date_to=' ~ dt %}
+            {% endif %}
+            {% if current_path == '/' %}
+                <span style="color: white; font-size: 1.5rem; font-weight: bold; cursor: default; opacity: .8;">Leasing Pro</span>
+            {% else %}
+                <a href="{{ offersUrl }}" style="color: white; text-decoration: none; font-size: 1.5rem; font-weight: bold;">Leasing Pro</a>
+            {% endif %}
             <ul style="list-style: none; display: flex; gap: 2rem; margin: 0; padding: 0;">
-                <li><a href="/" style="color: white; text-decoration: none;">Strona główna</a></li>
                 <li><a href="/admin" style="color: white; text-decoration: none;">Panel admina</a></li>
             </ul>
         </nav>

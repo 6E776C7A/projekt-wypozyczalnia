@@ -9,7 +9,7 @@
             <div class="mb-4">
                 <h1 class="h2 mb-1">Dostępne pojazdy</h1>
                 <div class="mt-2">
-                    <a href="/" class="btn btn-danger btn-sm">Zmień termin</a>
+                    <a href="/reset-dates" class="btn btn-danger btn-sm">Zmień termin</a>
                 </div>
                 {% if dates.from and dates.to %}
                     <p class="text-muted mb-0 mt-2">Termin: <strong>{{ dates.from }}</strong> — <strong>{{ dates.to }}</strong></p>
@@ -17,7 +17,7 @@
             </div>
 
             {# Filtry wyszukiwania #}
-            <div class="mb-4">
+            <div class="mb-5">
                 {% include 'partials/offer/_filters.twig' %}
             </div>
 
@@ -36,7 +36,7 @@
             {% endif %}
 
             {% if hasFilters %}
-                <div class="mb-4" style="background: #f8f9fa; padding: 1rem; border-radius: 8px; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                <div class="mb-5" style="background: #f8f9fa; padding: 1rem; border-radius: 8px; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
                     <strong>Aktywne filtry:</strong>
                     {% if f.category %}<span class="badge bg-light text-dark">Kategoria: {{ f.category }}</span>{% endif %}
                     {% if f.transmission %}<span class="badge bg-light text-dark">Skrzynia: {{ f.transmission }}</span>{% endif %}
