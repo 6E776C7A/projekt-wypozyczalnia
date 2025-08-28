@@ -238,7 +238,7 @@ if ($requestMethod === 'POST' && preg_match('#^/offers/(\d+)/book$#', $requestUr
         ':token' => $token
     ]);
 
-    header('Location: /offers?status=booked');
+    header('Location: /offers/confirmation');
     exit();
 }
 
@@ -510,6 +510,12 @@ switch ($requestUri) {
             'status' => $_GET['status'] ?? null
         ]);
         break;
+
+    // --- TRASA: Akcja zatwierdzania rezerwacji ---
+    // Adres: http://localhost:8080/offers/confirmation
+    case '/offers/confirmation':
+    echo $twig->render('pages/offer/confirmation.twig');
+    break;
 
     // --- TRASA: Akcja usuwania samochodu ---
     // Adres: http://localhost:8080/delete (np. z formularza metodą POST)
