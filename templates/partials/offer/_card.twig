@@ -41,7 +41,7 @@
 
         {% if car.total_price is defined %}
             <div class="alert alert-info border-0 text-center mb-3">
-                <p class="small text-muted mb-1">Cena za cały termin:</p>
+                <p class="small text-muted mb-1 ">Cena za cały termin:</p>
                 <p class="fw-bold mb-0">{{ car.total_price|number_format(2, ',', ' ') }} zł</p>
             </div>
         {% endif %}

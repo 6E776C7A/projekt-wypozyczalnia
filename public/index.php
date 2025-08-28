@@ -31,7 +31,7 @@ function isLoggedIn() {
 
 function requireLogin() {
     if (!isLoggedIn()) {
-        header('Location: /admin');
+        header('Location: /admin/login');
         exit();
     }
 }
@@ -275,88 +275,74 @@ switch ($requestUri) {
         header('Location: /');
         exit();
         break;
+    
+        // --- TRASA: Logowanie administratora ---
+    case '/admin/login':
+    if ($requestMethod === 'POST') {
+        $username = $_POST['username'] ?? '';
+        $password = $_POST['password'] ?? '';
+        if (login($username, $password)) {
+            header('Location: /admin');
+            exit();
+        } else {
+            echo $twig->render('pages/admin/login.twig', [
+                'login_error' => 'Nieprawidłowa nazwa użytkownika lub hasło'
+            ]);
+            exit();
+        }
+    } else {
+        echo $twig->render('pages/admin/login.twig');
+        exit();
+    }
+    break;
 
     // --- TRASA: Panel Administratora ---
     // Adres: http://localhost:8080/admin
     case '/admin':
-        if ($requestMethod === 'POST') {
-            // Sprawdź czy to logowanie czy dodawanie samochodu
-            if (isset($_POST['username']) && isset($_POST['password'])) {
-                // To jest próba logowania
-                $username = $_POST['username'] ?? '';
-                $password = $_POST['password'] ?? '';
-                
-                if (login($username, $password)) {
-                    header('Location: /admin');
-                    exit();
-                } else {
-                    // Logowanie nie powiodło się - pokaż formularz logowania z błędem
-                    echo $twig->render('pages/admin/dashboard.twig', [
-                        'cars' => [],
-                        'reservations' => [],
-                        'status' => null,
-                        'username' => null,
-                        'show_login' => true,
-                        'login_error' => 'Nieprawidłowa nazwa użytkownika lub hasło'
-                    ]);
-                    exit();
-                }
-            } else {
-                // To jest dodawanie nowego samochodu - wymaga logowania
-                requireLogin();
-                
-                $make = $_POST['make'] ?? '';
-                $model = $_POST['model'] ?? '';
-                $category = $_POST['category'] ?? 'Osobowy';
-                $transmission = $_POST['transmission'] ?? 'Manual';
-                $seats = $_POST['seats'] ?? 5;
-                $workdayPrice = $_POST['workday_price'] ?? 0;
-                $weekendPrice = $_POST['weekend_price'] ?? 0;
-                $imageUrl = $_POST['image_url'] ?? '';
+        requireLogin();
+        // Użytkownik jest zalogowany - pokaż panel
+        $stmt = $pdo->query("SELECT * FROM cars ORDER BY id DESC");
+        $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-                if ($make && $model && $workdayPrice > 0 && $weekendPrice > 0) {
-                    $stmt = $pdo->prepare("
-                        INSERT INTO cars (make, model, category, transmission, seats, workday_price, weekend_price, image_url) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                    ");
-                    $stmt->execute([$make, $model, $category, $transmission, (int)$seats, $workdayPrice, $weekendPrice, $imageUrl]);
-                    
-                    header('Location: /admin?status=added');
-                    exit();
-                } else {
-                    header('Location: /admin?status=error');
-                    exit();
-                }
-            }
-        } else {
-            // GET request - wyświetl panel lub formularz logowania
-            if (isLoggedIn()) {
-                // Użytkownik jest zalogowany - pokaż panel
-                $stmt = $pdo->query("SELECT * FROM cars ORDER BY id DESC");
-                $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $rstmt = $pdo->query("SELECT r.*, c.make, c.model FROM reservations r JOIN cars c ON c.id = r.car_id ORDER BY r.created_at DESC");
+        $reservations = $rstmt->fetchAll(PDO::FETCH_ASSOC);
 
-                // Pobierz rezerwacje (z nazwą auta)
-                $rstmt = $pdo->query("SELECT r.*, c.make, c.model FROM reservations r JOIN cars c ON c.id = r.car_id ORDER BY r.created_at DESC");
-                $reservations = $rstmt->fetchAll(PDO::FETCH_ASSOC);
-
-                echo $twig->render('pages/admin/dashboard.twig', [
-                    'cars' => $cars,
-                    'reservations' => $reservations,
-                    'status' => $_GET['status'] ?? null,
-                    'username' => $_SESSION['admin_username'] ?? 'Admin'
-                ]);
-            } else {
-                // Użytkownik nie jest zalogowany - pokaż formularz logowania
-                echo $twig->render('pages/admin/dashboard.twig', [
-                    'cars' => [],
-                    'reservations' => [],
-                    'status' => null,
-                    'username' => null,
-                    'show_login' => true
-                ]);
-            }
-        }
+        echo $twig->render('pages/admin/dashboard.twig', [
+            'cars' => $cars,
+            'reservations' => $reservations,
+            'status' => $_GET['status'] ?? null,
+            'username' => $_SESSION['admin_username'] ?? 'Admin'
+        ]);
         break;
+    
+    // --- TRASA: Dodawanie nowego samochodu ---
+    // Adres: http://localhost:8080/admin/car/add (POST)
+    case '/admin/car/add':
+    requireLogin();
+    if ($requestMethod === 'POST') {
+        $make = trim($_POST['make'] ?? '');
+        $model = trim($_POST['model'] ?? '');
+        $category = trim($_POST['category'] ?? '');
+        $transmission = trim($_POST['transmission'] ?? '');
+        $seats = (int)($_POST['seats'] ?? 5);
+        $workday_price = (float)($_POST['workday_price'] ?? 0);
+        $weekend_price = (float)($_POST['weekend_price'] ?? 0);
+        $image_url = trim($_POST['image_url'] ?? '');
+
+        // Prosta walidacja
+        if ($make && $model && $category && $transmission && $seats > 0 && $workday_price >= 0 && $weekend_price >= 0) {
+            $stmt = $pdo->prepare("INSERT INTO cars (make, model, category, transmission, seats, workday_price, weekend_price, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$make, $model, $category, $transmission, $seats, $workday_price, $weekend_price, $image_url]);
+            header('Location: /admin?status=car_added');
+            exit();
+        } else {
+            header('Location: /admin?status=add_error');
+            exit();
+        }
+    }
+    // Jeśli ktoś wejdzie GET-em, przekieruj na dashboard
+    header('Location: /admin');
+    exit();
 
     // --- TRASA: Lista ofert / wyszukiwanie ---
     // Adres: http://localhost:8080/offers

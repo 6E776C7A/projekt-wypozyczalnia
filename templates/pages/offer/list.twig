@@ -3,9 +3,8 @@
 {% block title %}Wszystkie pojazdy | {{ parent() }}{% endblock %}
 
 {% block content %}
-    <section class="bg-promary py-5 min-vh-100">
+    <section class="py-5 min-vh-100">
         <div class="container">
-            {# Header: tytuł, pod nim przycisk zmiany terminu, a następnie zakres dat #}
             <div class="text-center mb-5">
                 <h1 class="display-4 fw-bold text-primary mb-3">Dostępne pojazdy</h1>
                 <div class="mb-3">
@@ -18,30 +17,13 @@
                 {% endif %}
             </div>
 
-            {# Filtry wyszukiwania #}
             <div class="card shadow-sm border-0 mb-5">
                 <div class="card-body p-4">
                     {% include 'partials/offer/_filters.twig' %}
                 </div>
             </div>
 
-            {# Aktywne filtry + przycisk do anulowania #}
             {% set f = filters|default({}) %}
-            {% set hasFilters = (f.category is defined and f.category) or (f.transmission is defined and f.transmission) or (f.max_price is defined and f.max_price) or (f.make is defined and f.make) or (f.model is defined and f.model) or (f.seats is defined and f.seats) or (f.sort is defined and f.sort != 'price_asc') %}
-            
-            {% if status == 'booked' %}
-                <div class="alert alert-success alert-dismissible fade show" role="alert" data-bs-dismiss="alert">
-                    <i class="bi bi-check-circle-fill me-2"></i>
-                    Rezerwacja przyjęta! Auto nie będzie już widoczne w tym terminie.
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            {% elseif status == 'cancelled' %}
-                <div class="alert alert-info alert-dismissible fade show" role="alert" data-bs-dismiss="alert">
-                    <i class="bi bi-info-circle-fill me-2"></i>
-                    Rezerwacja została anulowana. Auto wróciło do puli dostępnych pojazdów.
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            {% endif %}
 
             {% if hasFilters %}
                 <div class="card bg-light border-0 mb-4">
@@ -64,7 +46,6 @@
                 </div>
             {% endif %}
 
-            {# Wyniki #}
             {% if cars is empty %}
                 <div class="text-center py-5">
                     <div class="alert alert-warning border-0" role="alert">

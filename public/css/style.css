@@ -4,6 +4,7 @@
     --bs-primary-rgb: 102, 126, 234;
     --bs-secondary: #764ba2;
     --bs-secondary-rgb: 118, 75, 162;
+    --bs-red: rgb(255, 0, 0);
 }
 
 /* Custom background gradient for body */
@@ -116,6 +117,10 @@ main {
     color: var(--bs-primary) !important;
 }
 
+.text-red {
+    color: var(--bs-red) !important;
+}
+
 /* Custom footer styling */
 footer {
     background: linear-gradient(135deg, #333 0%, #555 100%) !important;
@@ -171,6 +176,11 @@ footer {
 .card {
     border-radius: 15px;
     overflow: hidden;
+}
+
+.card.no-hover:hover {
+    box-shadow: none !important;
+    transform: none !important;
 }
 
 /* Enhanced button groups */
@@ -252,6 +262,7 @@ html, body {
 /* Hero section improvements */
 .bg-primary {
     background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-secondary) 100%) !important;
+    background-color: unset !important;
 }
 
 /* Card improvements for hero section */

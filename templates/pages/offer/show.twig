@@ -3,19 +3,15 @@
 {% block title %}Szczegóły oferty | {{ parent() }}{% endblock %}
 
 {% block content %}
-<section class="py-5 min-vh-100">
+<section class="d-flex py-5 min-vh-100">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-10">
                 <div class="card shadow-lg border-0">
                     <div class="card-body p-5">
-                        <h1 class="text-center mb-4 text-primary fw-bold">{{ car.make }} {{ car.model }}</h1>
-
+                        <h1 class="text-center text-primary mb-4 fw-bold">{{ car.make }} {{ car.model }}</h1>
                         {% if status == 'booked' %}
-                            <div class="alert alert-success" role="alert">
-                                <i class="bi bi-check-circle-fill me-2"></i>
-                                Rezerwacja przyjęta! Potwierdzenie wysłano na podany e-mail.
-                            </div>
+                            
                         {% elseif status == 'invalid_form' %}
                             <div class="alert alert-danger" role="alert">
                                 <i class="bi bi-exclamation-triangle-fill me-2"></i>
@@ -26,11 +22,6 @@
                                 <i class="bi bi-exclamation-triangle-fill me-2"></i>
                                 Nieprawidłowy zakres dat. Wróć do listy i ustaw termin.
                             </div>
-                        {% elseif status == 'unavailable' %}
-                            <div class="alert alert-warning" role="alert">
-                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                                Niestety w wybranym terminie pojazd jest niedostępny.
-                            </div>
                         {% elseif status == 'captcha_error' %}
                             <div class="alert alert-danger" role="alert">
                                 <i class="bi bi-exclamation-triangle-fill me-2"></i>
@@ -39,8 +30,8 @@
                         {% endif %}
 
                         <div class="row g-4">
-                            <div class="col-md-6">
-                                <div class="position-relative">
+                            <div class="col-md-12">
+                                <div class="position-relative d-flex justify-content-center">
                                     {% if car.image_url %}
                                         <img src="{{ car.image_url }}" alt="{{ car.make }} {{ car.model }}" class="img-fluid rounded-3 shadow">
                                     {% else %}
@@ -53,51 +44,55 @@
                                     {% endif %}
                                 </div>
                             </div>
-                            
-                            <div class="col-md-6">
-                                <div class="card bg-light border-0 mb-4">
-                                    <div class="card-body">
-                                        <h5 class="card-title mb-3">
-                                            <i class="bi bi-info-circle me-2"></i>Specyfikacja pojazdu
-                                        </h5>
-                                        <ul class="list-unstyled mb-0">
-                                            <li class="d-flex justify-content-between py-2 border-bottom">
-                                                <strong>Kategoria:</strong>
-                                                <span class="badge bg-primary">{{ car.category }}</span>
-                                            </li>
-                                            <li class="d-flex justify-content-between py-2 border-bottom">
-                                                <strong>Skrzynia biegów:</strong>
-                                                <span class="badge bg-secondary">{{ car.transmission }}</span>
-                                            </li>
-                                            <li class="d-flex justify-content-between py-2 border-bottom">
-                                                <strong>Miejsca:</strong>
-                                                <span class="badge bg-info">{{ car.seats }}</span>
-                                            </li>
-                                            <li class="d-flex justify-content-between py-2 border-bottom">
-                                                <strong>Doba (dni robocze):</strong>
-                                                <span class="text-success fw-bold">{{ car.workday_price|number_format(2, ',', ' ') }} zł</span>
-                                            </li>
-                                            <li class="d-flex justify-content-between py-2">
-                                                <strong>Doba (weekend):</strong>
-                                                <span class="text-primary fw-bold">{{ car.weekend_price|number_format(2, ',', ' ') }} zł</span>
-                                            </li>
-                                        </ul>
+                            <div>
+                                <div class="col-md-12">
+                                    <div class="card no-hover bg-light border-0 mb-4">
+                                        <div class="card-body">
+                                            <h5 class="card-title mb-3">
+                                                <i class="bi bi-info-circle me-2"></i>Specyfikacja pojazdu
+                                            </h5>
+                                            <ul class="list-unstyled mb-0">
+                                                <li class="d-flex justify-content-between py-2 border-bottom">
+                                                    <strong>Kategoria:</strong>
+                                                    <span class="badge bg-primary">{{ car.category }}</span>
+                                                </li>
+                                                <li class="d-flex justify-content-between py-2 border-bottom">
+                                                    <strong>Skrzynia biegów:</strong>
+                                                    <span class="badge bg-secondary">{{ car.transmission }}</span>
+                                                </li>
+                                                <li class="d-flex justify-content-between py-2 border-bottom">
+                                                    <strong>Miejsca:</strong>
+                                                    <span class="badge bg-info">{{ car.seats }}</span>
+                                                </li>
+                                                <li class="d-flex justify-content-between py-2 border-bottom">
+                                                    <strong>Doba (dni robocze):</strong>
+                                                    <span class="text-success fw-bold">{{ car.workday_price|number_format(2, ',', ' ') }} zł</span>
+                                                </li>
+                                                <li class="d-flex justify-content-between py-2">
+                                                    <strong>Doba (weekend):</strong>
+                                                    <span class="text-primary fw-bold">{{ car.weekend_price|number_format(2, ',', ' ') }} zł</span>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="card bg-primary text-white border-0 mb-4">
+                                <div class="card no-hover text-white bg-primary border-0 mb-4">
                                     <div class="card-body text-center">
-                                        <h5 class="card-title mb-3">
-                                            <i class="bi bi-calculator me-2"></i>Podsumowanie ceny
+                                        <h5 class="card-title">
+                                            Podsumowanie
                                         </h5>
                                         <p class="mb-2">Termin: <strong>{{ dates.from }}</strong> — <strong>{{ dates.to }}</strong></p>
                                         {% if total_price is not null %}
-                                            <div class="total-price">{{ total_price|number_format(2, ',', ' ') }} zł</div>
+                                            <div class="total-price mb-2 fw-bold">Cena: {{ total_price|number_format(2, ',', ' ') }} zł</div>
                                         {% endif %}
+                                        <h6 class="card-title text-red">
+                                            Rezerwacji nie można anulować na 48 godzin przed terminem odbioru samochodu.
+                                        </h6>
                                     </div>
                                 </div>
 
-                                <div class="card border-0 shadow-sm">
+                                <div class="card no-hover border-0 shadow-sm">
                                     <div class="card-body">
                                         <h5 class="card-title mb-3">
                                             <i class="bi bi-person-fill me-2"></i>Dane wypożyczającego

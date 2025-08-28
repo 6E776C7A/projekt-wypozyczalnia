@@ -3,11 +3,10 @@
 {% block title %}Strona główna | {{ parent() }}{% endblock %}
 
 {% block content %}
-    {# Sekcja "Hero" z głównym hasłem i wyszukiwarką #}
     <section class="bg-primary text-white d-flex align-items-center min-vh-100">
         <div class="container">
             <div class="row justify-content-center">
-                <div class="col-lg-8 text-center">
+                <div class="col-lg-9 text-center">
                     <h1 class="display-3 fw-bold mb-4">Samochód w abonamencie lub leasingu. Prościej się nie da.</h1>
                     <p class="lead mb-5 fs-4">Wybierz auto, dopasuj ratę i odbierz kluczyki.</p>
                     
@@ -43,51 +42,10 @@
                                     </button>
                                 </div>
                             </form>
-                            
-                            {% if date_error %}
-                                <div class="alert alert-warning mt-4" role="alert">
-                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                                    {% if date_error == 'Data_początkowa_nie_może_być_w_przeszłości' %}
-                                        <strong>Błąd:</strong> Data początkowa nie może być w przeszłości. Wybierz datę od dzisiaj.
-                                    {% elseif date_error == 'Data_końcowa_musi_być_późniejsza_niż_początkowa' %}
-                                        <strong>Błąd:</strong> Data końcowa musi być późniejsza niż początkowa.
-                                    {% elseif date_error == 'Wybierz_poprawny_termin_wypożyczenia' %}
-                                        <strong>Błąd:</strong> Wybierz poprawny termin wypożyczenia.
-                                    {% else %}
-                                        {{ date_error }}
-                                    {% endif %}
-                                </div>
-                            {% endif %}
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-{% endblock %}
-
-{% block javascripts %}
-<script>
-// Walidacja dat - data końcowa nie może być wcześniejsza niż początkowa
-document.addEventListener('DOMContentLoaded', function() {
-    const dateFrom = document.getElementById('date_from');
-    const dateTo = document.getElementById('date_to');
-    
-    function updateDateToMin() {
-        if (dateFrom.value) {
-            dateTo.min = dateFrom.value;
-            if (dateTo.value && dateTo.value < dateFrom.value) {
-                dateTo.value = dateFrom.value;
-            }
-        }
-    }
-    
-    dateFrom.addEventListener('change', updateDateToMin);
-    
-    // Ustaw minimalną datę dla obu pól na dzisiaj
-    const today = new Date().toISOString().split('T')[0];
-    dateFrom.min = today;
-    dateTo.min = today;
-});
-</script>
 {% endblock %}
