@@ -238,7 +238,7 @@ if ($requestMethod === 'POST' && preg_match('#^/offers/(\d+)/book$#', $requestUr
         ':token' => $token
     ]);
 
-    header('Location: /offers/confirmation');
+    header('Location: /offers/confirmation?token=' . urlencode($token));
     exit();
 }
 
@@ -514,8 +514,40 @@ switch ($requestUri) {
     // --- TRASA: Akcja zatwierdzania rezerwacji ---
     // Adres: http://localhost:8080/offers/confirmation
     case '/offers/confirmation':
-    echo $twig->render('pages/offer/confirmation.twig');
-    break;
+        $token = $_GET['token'] ?? '';
+        if (empty($token)) {
+            echo $twig->render('pages/static/404.twig', [
+                'error_message' => 'Brak tokenu potwierdzenia.'
+            ]);
+            break;
+        }
+
+        $stmt = $pdo->prepare("SELECT * FROM reservations WHERE cancellation_token = :token");
+        $stmt->execute([':token' => $token]);
+        $booking = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$booking) {
+            echo $twig->render('pages/static/404.twig', [
+                'error_message' => 'Rezerwacja nie została znaleziona.'
+            ]);
+            break;
+        }
+
+        $car = $pdo->prepare("SELECT * FROM cars WHERE id = :id");
+        $car->execute([':id' => $booking['car_id']]);
+        $carData = $car->fetch(PDO::FETCH_ASSOC);
+
+        $bookingTimestamp = strtotime($booking['start_date']);
+        $nowTimestamp = time();
+        $hoursUntilStart = ($bookingTimestamp - $nowTimestamp) / 3600;
+        $canCancel = $hoursUntilStart >= 48;
+
+        echo $twig->render('pages/offer/confirmation.twig', [
+            'booking' => $booking,
+            'car' => $carData,
+            'canCancel' => $canCancel
+        ]);
+        break;
 
     // --- TRASA: Akcja usuwania samochodu ---
     // Adres: http://localhost:8080/delete (np. z formularza metodą POST)

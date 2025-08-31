@@ -44,6 +44,38 @@
                             </form>
                         </div>
                     </div>
+
+                    <!-- Rubryka do anulowania rezerwacji -->
+                    <div class="card border-0 shadow-lg mt-4">
+                        <div class="card-body p-4">
+                            <h4 class="card-title mb-3 text-dark">Anuluj rezerwację</h4>
+                            <p class="text-muted mb-3">Masz token anulowania? Wklej go tutaj, aby anulować rezerwację</p>
+                            
+                            <form method="GET" action="/reservations/cancel" class="row g-3">
+                                <div class="col-md-8">
+                                    <label for="cancel_token" class="form-label fw-bold text-dark">Token anulowania</label>
+                                    <input type="text" 
+                                           id="cancel_token" 
+                                           name="token" 
+                                           class="form-control form-control-lg" 
+                                           placeholder="Wklej tutaj swój token anulowania"
+                                           required>
+                                </div>
+                                <div class="col-md-4 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-danger btn-lg w-100">
+                                        <i class="bi bi-x-circle me-2"></i>Anuluj
+                                    </button>
+                                </div>
+                            </form>
+                            
+                            <div class="mt-3">
+                                <small class="text-muted">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Token anulowania otrzymasz po złożeniu rezerwacji. Anulowanie możliwe najpóźniej 48 godzin przed rozpoczęciem.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
