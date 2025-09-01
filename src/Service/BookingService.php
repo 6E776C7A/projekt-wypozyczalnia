@@ -1,6 +1,4 @@
 <?php
-// Plik: src/Service/BookingService.php
-
 namespace App\Service;
 
 use DateInterval;
@@ -17,13 +15,13 @@ class BookingService
         $period = new DatePeriod(
             new DateTime($dateFrom),
             new DateInterval('P1D'),
-            new DateTime($dateTo)
+            (new DateTime($dateTo))->modify('+1 day')
         );
 
         $totalPrice = 0;
         foreach ($period as $date) {
-            $dayOfWeek = $date->format('N'); // 'N' zwraca 1 dla poniedziałku, ..., 6 dla soboty, 7 dla niedzieli
-            if ($dayOfWeek >= 6) { // Jeśli to sobota lub niedziela
+            $dayOfWeek = $date->format('N'); // 1=pon, ..., 6=sob, 7=nd
+            if ($dayOfWeek >= 6) {
                 $totalPrice += $priceWeekend;
             } else {
                 $totalPrice += $priceWeekday;

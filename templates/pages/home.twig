@@ -3,6 +3,39 @@
 {% block title %}Strona główna | {{ parent() }}{% endblock %}
 
 {% block content %}
+    {% if status == 'cancelled' %}
+    <div class="modal fade show" id="cancelModal" tabindex="-1" style="display:block; background:rgba(0,0,0,0.5);" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+            <h5 class="modal-title">Sukces</h5>
+        </div>
+        <div class="modal-body text-center">
+            <p class="mb-0">Pomyślnie anulowano rezerwację.</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-success" onclick="document.getElementById('cancelModal').style.display='none'; location.href='/'">Zamknij</button>
+        </div>
+        </div>
+    </div>
+    </div>
+    {% elseif status == 'cancel_error' %}
+    <div class="modal fade show" id="cancelModal" tabindex="-1" style="display:block; background:rgba(0,0,0,0.5);" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title">Błąd</h5>
+        </div>
+        <div class="modal-body text-center">
+            <p class="mb-0">Nie udało się anulować rezerwacji.</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-danger" onclick="document.getElementById('cancelModal').style.display='none'; location.href='/'">Zamknij</button>
+        </div>
+        </div>
+    </div>
+    </div>
+{% endif %}
     <section class="bg-primary text-white d-flex align-items-center min-vh-100">
         <div class="container">
             <div class="row justify-content-center">

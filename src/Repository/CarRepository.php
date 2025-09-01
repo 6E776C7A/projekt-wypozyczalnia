@@ -1,6 +1,4 @@
 <?php
-// Plik: src/Repository/CarRepository.php
-
 namespace App\Repository;
 
 use PDO;
@@ -20,6 +18,12 @@ class CarRepository
         $stmt->execute([':id' => $id]);
         $result = $stmt->fetch();
         return $result ?: null;
+    }
+
+    public function findAll(): array
+    {
+        $stmt = $this->pdo->query("SELECT * FROM cars ORDER BY id DESC");
+        return $stmt->fetchAll();
     }
 
     public function findAvailableCars(string $dateFrom, string $dateTo, array $filters = []): array
@@ -56,6 +60,44 @@ class CarRepository
         $stmt->execute([':token' => $token]);
         $result = $stmt->fetch();
         return $result ?: null;
+    }
+
+    public function findAllReservationsWithCar(): array
+    {
+        $sql = "SELECT r.*, c.make, c.model, c.category FROM reservations r
+                JOIN cars c ON r.car_id = c.id
+                ORDER BY r.start_date DESC";
+        $stmt = $this->pdo->query($sql);
+        return $stmt->fetchAll();
+    }
+
+    public function addCar(string $make, string $model, string $category, string $transmission, int $seats, float $workday_price, float $weekend_price, string $image_url): bool
+    {
+        $sql = "INSERT INTO cars (make, model, category, transmission, seats, workday_price, weekend_price, image_url)
+                VALUES (:make, :model, :category, :transmission, :seats, :workday_price, :weekend_price, :image_url)";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([
+            ':make' => $make,
+            ':model' => $model,
+            ':category' => $category,
+            ':transmission' => $transmission,
+            ':seats' => $seats,
+            ':workday_price' => $workday_price,
+            ':weekend_price' => $weekend_price,
+            ':image_url' => $image_url
+        ]);
+    }
+
+    public function deleteCarById(int $id): bool
+    {
+        $stmt = $this->pdo->prepare("DELETE FROM cars WHERE id = :id");
+        return $stmt->execute([':id' => $id]);
+    }
+
+    public function deleteReservationById(int $id): bool
+    {
+        $stmt = $this->pdo->prepare("DELETE FROM reservations WHERE id = :id");
+        return $stmt->execute([':id' => $id]);
     }
 
     public function deleteBookingById(int $id): bool

@@ -1,6 +1,4 @@
 <?php
-// Plik: src/Controller/CarController.php
-
 namespace App\Controller;
 
 use App\Repository\CarRepository;
@@ -39,76 +37,6 @@ class CarController
         ]);
     }
 
-    public function listAvailableCars(array $getData)
-    {
-        $dateFrom = $getData['date_from'] ?? '';
-        $dateTo = $getData['date_to'] ?? '';
-
-        if (empty($dateFrom) || empty($dateTo) || $dateTo <= $dateFrom) {
-            echo $this->twig->render('pages/offer/list.twig', [
-                'cars' => [],
-                'dates' => ['from' => $dateFrom, 'to' => $dateTo],
-                'requireDates' => true,
-                'filters' => [],
-                'makes' => [],
-                'models' => [],
-                'seatsOptions' => [],
-                'error' => 'Proszę podać poprawny zakres dat.'
-            ]);
-            return;
-        }
-
-        $cars = $this->carRepository->findAvailableCars($dateFrom, $dateTo);
-
-        foreach ($cars as &$car) {
-            $car['total_price'] = $this->bookingService->calculatePrice(
-                $dateFrom,
-                $dateTo,
-                $car['workday_price'],
-                $car['weekend_price']
-            );
-        }
-
-        echo $this->twig->render('pages/offer/list.twig', [
-            'cars' => $cars,
-            'dates' => ['from' => $dateFrom, 'to' => $dateTo],
-            'requireDates' => false,
-            'filters' => $getData,
-            'makes' => $this->carRepository->getDistinctMakes(),
-            'models' => $this->carRepository->getDistinctModels(),
-            'seatsOptions' => $this->carRepository->getDistinctSeats()
-        ]);
-    }
-
-    public function bookCar(array $postData)
-    {
-        $carId = $postData['car_id'] ?? null;
-        $email = $postData['email'] ?? '';
-        $firstName = $postData['first_name'] ?? '';
-        $lastName = $postData['last_name'] ?? '';
-        $dateFrom = $postData['date_from'] ?? '';
-        $dateTo = $postData['date_to'] ?? '';
-
-        if (empty($carId) || empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL) || 
-            empty($firstName) || empty($lastName)) {
-            die("Błąd: nieprawidłowe dane w formularzu.");
-        }
-
-        $car = $this->carRepository->findById((int)$carId);
-        if (!$car) {
-            die("Błąd: samochód nie istnieje.");
-        }
-
-        $totalCost = $this->bookingService->calculatePrice($dateFrom, $dateTo, $car['workday_price'], $car['weekend_price']);
-        $cancellation_token = bin2hex(random_bytes(32));
-
-        $this->carRepository->saveBooking((int)$carId, $email, $firstName, $lastName, $dateFrom, $dateTo, $totalCost, $cancellation_token);
-
-        // Przejdź do strony potwierdzenia z tokenem
-        header('Location: /mvc-example/confirm?token=' . urlencode($cancellation_token));
-        exit();
-    }
-
     public function showConfirmationPage(string $token)
     {
         if (empty($token)) {
@@ -119,6 +47,7 @@ class CarController
         }
 
         $booking = $this->carRepository->findBookingByToken($token);
+
         if (!$booking) {
             echo $this->twig->render('pages/static/404.twig', [
                 'error_message' => 'Rezerwacja nie została znaleziona.'
@@ -142,32 +71,30 @@ class CarController
 
     public function cancelBooking(string $token)
     {
+        $status = null;
+
         if (empty($token)) {
-            die("Brak tokenu anulowania.");
+            $status = 'cancel_error';
+        } else {
+            $booking = $this->carRepository->findBookingByToken($token);
+
+            if (!$booking) {
+                $status = 'cancel_error';
+            } else {
+                $bookingTimestamp = strtotime($booking['start_date']);
+                $nowTimestamp = time();
+
+                if (($bookingTimestamp - $nowTimestamp) < (48 * 3600)) {
+                    $status = 'cancel_error';
+                } else {
+                    $this->carRepository->deleteBookingById((int)$booking['id']);
+                    $status = 'cancelled';
+                }
+            }
         }
 
-        $booking = $this->carRepository->findBookingByToken($token);
-
-        if (!$booking) {
-            echo $this->twig->render('pages/static/404.twig', [
-                'error_message' => 'Rezerwacja nie została znaleziona lub została już anulowana.'
-            ]);
-            return;
-        }
-
-        $bookingTimestamp = strtotime($booking['start_date']);
-        $nowTimestamp = time();
-
-        if (($bookingTimestamp - $nowTimestamp) < (48 * 3600)) {
-            echo $this->twig->render('pages/static/404.twig', [
-                'error_message' => 'Nie można anulować rezerwacji na mniej niż 48 godzin przed datą odbioru.'
-            ]);
-            return;
-        }
-
-        $this->carRepository->deleteBookingById((int)$booking['id']);
-
-        header('Location: /offers?status=cancelled');
-        exit();
+        echo $this->twig->render('pages/home.twig', [
+            'status' => $status,
+        ]);
     }
 }
