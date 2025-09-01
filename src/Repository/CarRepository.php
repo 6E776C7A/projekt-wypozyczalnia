@@ -28,15 +28,66 @@ class CarRepository
 
     public function findAvailableCars(string $dateFrom, string $dateTo, array $filters = []): array
     {
-        $sql = "SELECT * FROM cars c
-                WHERE c.id NOT IN (
-                    SELECT r.car_id FROM reservations r
-                    WHERE (r.start_date <= :date_to) AND (r.end_date >= :date_from)
-                )";
+    $sql = "SELECT * FROM cars c
+            WHERE c.id NOT IN (
+                SELECT r.car_id FROM reservations r
+                WHERE (r.start_date <= :date_to) AND (r.end_date >= :date_from)
+            )";
+    $params = [
+        ':date_from' => $dateFrom,
+        ':date_to' => $dateTo
+    ];
 
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':date_from' => $dateFrom, ':date_to' => $dateTo]);
-        return $stmt->fetchAll();
+    // Marka
+    if (!empty($filters['make']) && $filters['make'] !== 'Wszystkie') {
+        $sql .= " AND c.make = :make";
+        $params[':make'] = $filters['make'];
+    }
+    // Model
+    if (!empty($filters['model']) && $filters['model'] !== 'Wszystkie') {
+        $sql .= " AND c.model = :model";
+        $params[':model'] = $filters['model'];
+    }
+    // Liczba miejsc
+    if (!empty($filters['seats']) && $filters['seats'] !== 'Dowolna') {
+        $sql .= " AND c.seats = :seats";
+        $params[':seats'] = $filters['seats'];
+    }
+    // Kategoria
+    if (!empty($filters['category']) && $filters['category'] !== 'Wszystkie') {
+        $sql .= " AND c.category = :category";
+        $params[':category'] = $filters['category'];
+    }
+    // Skrzynia biegów
+    if (!empty($filters['transmission']) && $filters['transmission'] !== 'Wszystkie') {
+        $sql .= " AND c.transmission = :transmission";
+        $params[':transmission'] = $filters['transmission'];
+    }
+    // Maksymalna cena dzienna
+    if (!empty($filters['max_price'])) {
+    $sql .= " AND c.workday_price <= :max_price AND c.weekend_price <= :max_price";
+    $params[':max_price'] = $filters['max_price'];
+    }
+
+    // Sortowanie
+    if (!empty($filters['sort'])) {
+        switch ($filters['sort']) {
+            case 'price_asc':
+                $sql .= " ORDER BY c.workday_price ASC";
+                break;
+            case 'price_desc':
+                $sql .= " ORDER BY c.workday_price DESC";
+                break;
+            default:
+                $sql .= " ORDER BY c.id DESC";
+        }
+    } else {
+        $sql .= " ORDER BY c.id DESC";
+    }
+
+    $stmt = $this->pdo->prepare($sql);
+    $stmt->execute($params);
+    return $stmt->fetchAll();
     }
 
     public function saveBooking(int $carId, string $email, string $firstName, string $lastName, string $dateFrom, string $dateTo, float $totalCost, string $token): bool
@@ -69,6 +120,23 @@ class CarRepository
                 ORDER BY r.start_date DESC";
         $stmt = $this->pdo->query($sql);
         return $stmt->fetchAll();
+    }
+
+    public function isCarAvailable(int $carId, string $dateFrom, string $dateTo): bool
+    {
+    $sql = "SELECT COUNT(*) FROM reservations
+            WHERE car_id = :car_id
+              AND (
+                (start_date <= :date_to AND end_date >= :date_from)
+              )";
+    $stmt = $this->pdo->prepare($sql);
+    $stmt->execute([
+        ':car_id' => $carId,
+        ':date_from' => $dateFrom,
+        ':date_to' => $dateTo
+    ]);
+    $count = $stmt->fetchColumn();
+    return $count == 0;
     }
 
     public function addCar(string $make, string $model, string $category, string $transmission, int $seats, float $workday_price, float $weekend_price, string $image_url): bool

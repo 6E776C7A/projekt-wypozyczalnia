@@ -28,6 +28,9 @@
                                 Proszę zaznaczyć reCAPTCHA przed złożeniem rezerwacji.
                             </div>
                         {% endif %}
+                        {% if form_error %}
+                            <div class="alert alert-danger">{{ form_error }}</div>
+                        {% endif %}
 
                         <div class="row g-4">
                             <div class="col-md-12">
@@ -102,7 +105,9 @@
                                         <h5 class="card-title mb-3">
                                             <i class="bi bi-person-fill me-2"></i>Dane wypożyczającego
                                         </h5>
-                                        <form method="POST" action="/offers/{{ car.id }}/book">
+                                        <form method="POST" action="/offers/{{ car.id }}">
+                                        <input type="hidden" name="date_from" value="{{ dates.from }}">
+                                        <input type="hidden" name="date_to" value="{{ dates.to }}">
                                             <div class="row g-3">
                                                 <div class="col-md-6">
                                                     <label for="first_name" class="form-label">Imię</label>

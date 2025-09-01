@@ -50,20 +50,20 @@
                             
                             <form method="GET" action="/offers" class="row g-3">
                                 <div class="col-md-5">
-                                    <label for="date_from" class="form-label fw-bold text-dark">Data od</label>
+                                    <label for="from" class="form-label fw-bold text-dark">Data od</label>
                                     <input type="date" 
-                                           id="date_from" 
-                                           name="date_from" 
+                                           id="from" 
+                                           name="from" 
                                            class="form-control form-control-lg" 
                                            required 
                                            min="{{ "now"|date("Y-m-d") }}"
                                            value="{{ dates.from|default('') }}">
                                 </div>
                                 <div class="col-md-5">
-                                    <label for="date_to" class="form-label fw-bold text-dark">Data do</label>
+                                    <label for="to" class="form-label fw-bold text-dark">Data do</label>
                                     <input type="date" 
-                                           id="date_to" 
-                                           name="date_to" 
+                                           id="to" 
+                                           name="to" 
                                            class="form-control form-control-lg" 
                                            required 
                                            min="{{ "now"|date("Y-m-d") }}"

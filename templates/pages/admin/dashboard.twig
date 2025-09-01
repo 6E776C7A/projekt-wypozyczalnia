@@ -3,7 +3,7 @@
 {% block title %}Panel Administratora - Leasing Pro{% endblock %}
 
 {% block content %}
-<div class="container py-5 min-vh-100">
+    {# ALERTY NA SAMEJ GÓRZE #}
     {% if status == 'car_added' %}
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <i class="bi bi-check-circle-fill me-2"></i>
@@ -17,157 +17,159 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Zamknij"></button>
         </div>
     {% endif %}
-    <div class="row">
-        <div class="col-12 mb-4">
-            <div class="d-flex justify-content-between align-items-center">
-                <h1>Panel Administratora</h1>
-                <div class="d-flex align-items-center gap-3">
-                    <span class="text-muted">Zalogowany jako: <strong>{{ username }}</strong></span>
-                    <a href="/logout" class="btn btn-danger">Wyloguj się</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 mb-5">
-            {# Formularz dodawania nowego samochodu #}
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-primary text-white">
-                    <h2 class="h4 mb-0">Dodaj nowy samochód</h2>
-                </div>
-                <div class="card-body">
-                    <form action="/admin/car/add" method="POST" class="row g-3">
-                        <div class="col-md-6">
-                            <label for="make" class="form-label">Marka:</label>
-                            <input type="text" class="form-control" id="make" name="make" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="model" class="form-label">Model:</label>
-                            <input type="text" class="form-control" id="model" name="model" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="category" class="form-label">Kategoria:</label>
-                            <select class="form-select" id="category" name="category">
-                                <option value="Osobowy" selected>Osobowy</option>
-                                <option value="SUV">SUV</option>
-                                <option value="Dostawczy">Dostawczy</option>
-                                <option value="Sportowy">Sportowy</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="transmission" class="form-label">Skrzynia biegów:</label>
-                            <select class="form-select" id="transmission" name="transmission">
-                                <option value="Manual" selected>Manualna</option>
-                                <option value="Automatic">Automatyczna</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="seats" class="form-label">Liczba miejsc:</label>
-                            <input type="number" class="form-control" id="seats" name="seats" min="1" value="5" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="workday_price" class="form-label">Cena (dzień roboczy):</label>
-                            <input type="number" class="form-control" id="workday_price" name="workday_price" step="0.01" min="0" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="weekend_price" class="form-label">Cena (weekend):</label>
-                            <input type="number" class="form-control" id="weekend_price" name="weekend_price" step="0.01" min="0" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="image_url" class="form-label">URL do zdjęcia:</label>
-                            <input type="url" class="form-control" id="image_url" name="image_url" placeholder="https://example.com/car.jpg">
-                        </div>
-                        <div class="col-12">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-plus-circle me-2"></i>Dodaj samochód
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 mb-5">
-            {# Tabela z listą istniejących samochodów #}
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-secondary text-white">
-                    <h2 class="h4 mb-0">Zarządzaj samochodami</h2>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Marka</th>
-                                    <th>Model</th>
-                                    <th>Cena (dzień/weekend)</th>
-                                    <th>Akcje</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for car in cars %}
-                                <tr>
-                                    <td>{{ car.id }}</td>
-                                    <td>{{ car.make }}</td>
-                                    <td>{{ car.model }}</td>
-                                    <td>{{ car.workday_price|number_format(2, ',', ' ') }} zł / {{ car.weekend_price|number_format(2, ',', ' ') }} zł</td>
-                                    <td>
-                                        <form method="POST" action="/delete" style="display: inline;">
-                                            <input type="hidden" name="id" value="{{ car.id }}">
-                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Czy na pewno chcesz usunąć ten samochód?')">
-                                                <i class="bi bi-trash me-1"></i>Usuń
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+
+    <div class="container py-5 min-vh-100">
+        <div class="row">
+            <div class="col-12 mb-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1>Panel Administratora</h1>
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="text-muted">Zalogowany jako: <strong>{{ username }}</strong></span>
+                        <a href="/logout" class="btn btn-danger">Wyloguj się</a>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="col-12">
-            {# Tabela z rezerwacjami #}
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-info text-white">
-                    <h2 class="h4 mb-0">Rezerwacje</h2>
+            <div class="col-12 mb-5">
+                {# Formularz dodawania nowego samochodu #}
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="h4 mb-0">Dodaj nowy samochód</h2>
+                    </div>
+                    <div class="card-body">
+                        <form action="/admin/car/add" method="POST" class="row g-3">
+                            <div class="col-md-6">
+                                <label for="make" class="form-label">Marka:</label>
+                                <input type="text" class="form-control" id="make" name="make" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="model" class="form-label">Model:</label>
+                                <input type="text" class="form-control" id="model" name="model" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="category" class="form-label">Kategoria:</label>
+                                <select class="form-select" id="category" name="category">
+                                    <option value="Osobowy" selected>Osobowy</option>
+                                    <option value="SUV">SUV</option>
+                                    <option value="Dostawczy">Dostawczy</option>
+                                    <option value="Sportowy">Sportowy</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="transmission" class="form-label">Skrzynia biegów:</label>
+                                <select class="form-select" id="transmission" name="transmission">
+                                    <option value="Manual" selected>Manualna</option>
+                                    <option value="Automatic">Automatyczna</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="seats" class="form-label">Liczba miejsc:</label>
+                                <input type="number" class="form-control" id="seats" name="seats" min="1" value="5" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="workday_price" class="form-label">Cena (dzień roboczy):</label>
+                                <input type="number" class="form-control" id="workday_price" name="workday_price" step="0.01" min="0" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="weekend_price" class="form-label">Cena (weekend):</label>
+                                <input type="number" class="form-control" id="weekend_price" name="weekend_price" step="0.01" min="0" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="image_url" class="form-label">URL do zdjęcia:</label>
+                                <input type="url" class="form-control" id="image_url" name="image_url" placeholder="https://example.com/car.jpg">
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-plus-circle me-2"></i>Dodaj samochód
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Samochód</th>
-                                    <th>Termin</th>
-                                    <th>Klient</th>
-                                    <th>Koszt</th>
-                                    <th>Akcje</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for reservation in reservations %}
-                                <tr>
-                                    <td>{{ reservation.id }}</td>
-                                    <td>{{ reservation.make }} {{ reservation.model }}</td>
-                                    <td>{{ reservation.start_date|date('d.m.Y') }} - {{ reservation.end_date|date('d.m.Y') }}</td>
-                                    <td>{{ reservation.customer_email }}</td>
-                                    <td>{{ reservation.total_cost|number_format(2, ',', ' ') }} zł</td>
-                                    <td>
-                                        <form method="POST" action="/reservations/delete" style="display: inline;">
-                                            <input type="hidden" name="id" value="{{ reservation.id }}">
-                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Czy na pewno chcesz usunąć tę rezerwację?')">
-                                                <i class="bi bi-trash me-1"></i>Usuń
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+            </div>
+            <div class="col-12 mb-5">
+                {# Tabela z listą istniejących samochodów #}
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-secondary text-white">
+                        <h2 class="h4 mb-0">Zarządzaj samochodami</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Marka</th>
+                                        <th>Model</th>
+                                        <th>Cena (dzień/weekend)</th>
+                                        <th>Akcje</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for car in cars %}
+                                    <tr>
+                                        <td>{{ car.id }}</td>
+                                        <td>{{ car.make }}</td>
+                                        <td>{{ car.model }}</td>
+                                        <td>{{ car.workday_price|number_format(2, ',', ' ') }} zł / {{ car.weekend_price|number_format(2, ',', ' ') }} zł</td>
+                                        <td>
+                                            <form method="POST" action="/delete" style="display: inline;">
+                                                <input type="hidden" name="id" value="{{ car.id }}">
+                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Czy na pewno chcesz usunąć ten samochód?')">
+                                                    <i class="bi bi-trash me-1"></i>Usuń
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                {# Tabela z rezerwacjami #}
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-info text-white">
+                        <h2 class="h4 mb-0">Rezerwacje</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Samochód</th>
+                                        <th>Termin</th>
+                                        <th>Klient</th>
+                                        <th>Koszt</th>
+                                        <th>Akcje</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for reservation in reservations %}
+                                    <tr>
+                                        <td>{{ reservation.id }}</td>
+                                        <td>{{ reservation.make }} {{ reservation.model }}</td>
+                                        <td>{{ reservation.start_date|date('d.m.Y') }} - {{ reservation.end_date|date('d.m.Y') }}</td>
+                                        <td>{{ reservation.customer_email }}</td>
+                                        <td>{{ reservation.total_cost|number_format(2, ',', ' ') }} zł</td>
+                                        <td>
+                                            <form method="POST" action="/reservations/delete" style="display: inline;">
+                                                <input type="hidden" name="id" value="{{ reservation.id }}">
+                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Czy na pewno chcesz usunąć tę rezerwację?')">
+                                                    <i class="bi bi-trash me-1"></i>Usuń
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 {% endblock %}

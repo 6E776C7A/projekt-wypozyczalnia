@@ -58,7 +58,7 @@
                 <div class="row g-4">
                     {% for car in cars %}
                         <div class="col-md-6 col-lg-4">
-                            {% include 'partials/offer/_card.twig' with { car: car } %}
+                            {% include 'partials/offer/_card.twig' with { car: car, dates: dates } %}
                         </div>
                     {% endfor %}
                 </div>
