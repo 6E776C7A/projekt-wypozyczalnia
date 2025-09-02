@@ -22,20 +22,24 @@ Posiadanie zainstalowanego DockerDesktop.
     # docker-compose exec app bash
 
     # exit (wyjscie z terminala kontenera)
+  
+  5. Aby manualnie zarządzać bazą należy w terminalu dockera:
 
-  7. Można bazę podglądać też w VSC za pomocą rozszerzenia SQLite Viewer
+    # cd/data
 
-  8. Wpisanie komendy:
+    # sqlite3 mydb.sqlite
+
+  6. Można bazę podglądać też w VSC za pomocą rozszerzenia SQLite Viewer
+
+  7. Wpisanie komendy:
 
     # docker-compose down (wyłączenie kontenera oraz go wyczyszczenie, należy następnym razem wykonać pkt nr.1)
 
-  ## 9. !!! Baza danych nie jest wysyłana na gita tylko jest LOKALNIE !!!
-
-  10. Po dodaniu dodatkowych plików w VSC gdy kontener jest włączony należy wykonać:
+  8. Po dodaniu dodatkowych plików w VSC gdy kontener jest włączony należy wykonać:
 
     # docker-compose up -d (Aktualizacja plików kontenera)
 
-  11. Przydatne komendy Docker:
+  9. Przydatne komendy Docker:
 
     # docker -ps (Lista działających kontenerów)
 
@@ -44,6 +48,7 @@ Posiadanie zainstalowanego DockerDesktop.
     # docker-compose restart (restartuje kontener)
 
     # docekr-compose up -d (startuje kontener)
-  12. Strona dostępna jest pod adresem:
+    
+  10. Strona dostępna jest pod adresem:
   
     # localhost:8080
