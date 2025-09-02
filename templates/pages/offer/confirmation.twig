@@ -1,0 +1,48 @@
+{% extends 'layouts/base.twig' %}
+
+{% block title %}Potwierdzenie rezerwacji | {{ parent() }}{% endblock %}
+
+{% block content %}
+<div class="container min-vh-100 d-flex flex-column align-items-center justify-content-center">
+    <h2 class="display-5 text-center text-primary fw-bold mb-5">Dziękujemy za zaufanie naszej firmie. Oto twoje potwierdzenie:</h2>
+    <div class="card w-100 shadow">
+        <div class="card-body d-flex flex-column align-items-center">
+            <h2 class="display-5 mb-4 text-center text-primary fw-bold">
+                Rezerwacja nr. {{ booking.id }}
+            </h2>
+            <div class="row w-100 mb-4">
+                <div class="col-12 col-md-6 mb-3">
+                    <div class="text-muted mb-1 fw-medium">Data od</div>
+                    <div class="fw-semibold">{{ booking.start_date }}</div>
+                </div>
+                <div class="col-12 col-md-6 mb-3">
+                    <div class="text-muted mb-1 fw-medium">Data do</div>
+                    <div class="fw-semibold">{{ booking.end_date }}</div>
+                </div>
+                <div class="col-12 col-md-6 mb-3">
+                    <div class="text-muted mb-1 fw-medium">Email</div>
+                    <div class="fw-semibold">{{ booking.customer_email }}</div>
+                </div>
+                <div class="col-12 col-md-6 mb-3">
+                    <div class="text-muted mb-1 fw-medium">Całkowity koszt</div>
+                    <div class="fw-bold" style="color: #212529;">
+                        {{ booking.total_cost|number_format(2, ',', ' ') }} zł
+                    </div>
+                </div>
+            </div>
+            <div class="w-100 mb-4">
+                <div class="text-center text-muted mb-2 fw-medium">Token anulowania</div>
+                <div class="fw-semibold text-break bg-light p-2 rounded text-center" style="font-family: monospace;">
+                    {{ booking.cancellation_token }}
+                </div>
+            </div>
+            <div class="d-flex justify-content-center w-100">
+                <a href="/" class="btn btn-primary mt-2 mb-4">Wróć do strony głównej</a>
+            </div>
+            <p class="text-danger text-center mb-0">
+                Anulowanie możliwe najpóźniej 48 godzin przed rozpoczęciem.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

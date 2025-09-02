@@ -1,0 +1,73 @@
+<div class="search-filters">
+    {% set f = filters|default({}) %}
+    {% set d = dates|default({}) %}
+    <form method="GET" action="/offers" class="row g-3">
+        <div class="col-md-6 col-lg-4">
+            <label for="category" class="form-label fw-bold">Kategoria</label>
+            <select id="category" name="category" class="form-select">
+                <option value="" {{ (f.category is not defined or f.category == '') ? 'selected' : '' }}>Wszystkie kategorie</option>
+                <option value="Osobowy" {{ (f.category is defined and f.category == 'Osobowy') ? 'selected' : '' }}>Osobowy</option>
+                <option value="SUV" {{ (f.category is defined and f.category == 'SUV') ? 'selected' : '' }}>SUV</option>
+                <option value="Dostawczy" {{ (f.category is defined and f.category == 'Dostawczy') ? 'selected' : '' }}>Dostawczy</option>
+                <option value="Sportowy" {{ (f.category is defined and f.category == 'Sportowy') ? 'selected' : '' }}>Sportowy</option>
+            </select>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <label for="transmission" class="form-label fw-bold">Skrzynia biegów</label>
+            <select id="transmission" name="transmission" class="form-select">
+                <option value="" {{ (f.transmission is not defined or f.transmission == '') ? 'selected' : '' }}>Wszystkie</option>
+                <option value="Manual" {{ (f.transmission is defined and f.transmission == 'Manual') ? 'selected' : '' }}>Manualna</option>
+                <option value="Automatic" {{ (f.transmission is defined and f.transmission == 'Automatic') ? 'selected' : '' }}>Automatyczna</option>
+            </select>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <label for="make" class="form-label fw-bold">Marka</label>
+            <select id="make" name="make" class="form-select">
+                <option value="" {{ (f.make is not defined or f.make == '') ? 'selected' : '' }}>Wszystkie</option>
+                {% if makes is defined %}
+                    {% for m in makes %}
+                        <option value="{{ m }}" {{ (f.make is defined and f.make == m) ? 'selected' : '' }}>{{ m }}</option>
+                    {% endfor %}
+                {% endif %}
+            </select>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <label for="model" class="form-label fw-bold">Model</label>
+            <select id="model" name="model" class="form-select">
+                <option value="" {{ (f.model is not defined or f.model == '') ? 'selected' : '' }}>Wszystkie</option>
+                {% if models is defined %}
+                    {% for mm in models %}
+                        <option value="{{ mm }}" {{ (f.model is defined and f.model == mm) ? 'selected' : '' }}>{{ mm }}</option>
+                    {% endfor %}
+                {% endif %}
+            </select>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <label for="seats" class="form-label fw-bold">Liczba miejsc</label>
+            <select id="seats" name="seats" class="form-select">
+                <option value="" {{ (f.seats is not defined or f.seats == '') ? 'selected' : '' }}>Dowolna</option>
+                {% if seatsOptions is defined %}
+                    {% for s in seatsOptions %}
+                        <option value="{{ s }}" {{ (f.seats is defined and (f.seats ~ '') == (s ~ '')) ? 'selected' : '' }}>{{ s }}</option>
+                    {% endfor %}
+                {% endif %}
+            </select>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <label for="max_price" class="form-label fw-bold">Maksymalna cena dzienna</label>
+            <input type="number" id="max_price" name="max_price" placeholder="np. 200" value="{{ f.max_price is defined ? f.max_price : '' }}" class="form-control">
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <label for="sort" class="form-label fw-bold">Sortowanie</label>
+            <select id="sort" name="sort" class="form-select">
+                <option value="price_asc" {{ (f.sort is not defined or f.sort == 'price_asc') ? 'selected' : '' }}>Cena: od najniższej</option>
+                <option value="price_desc" {{ (f.sort is defined and f.sort == 'price_desc') ? 'selected' : '' }}>Cena: od najwyższej</option>
+            </select>
+        </div>
+        <div class="col-md-6 col-lg-4 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-search me-2"></i>Szukaj
+            </button>
+        </div>
+    </form>
+</div>

@@ -23,16 +23,6 @@ Posiadanie zainstalowanego DockerDesktop.
 
     # exit (wyjscie z terminala kontenera)
 
-  5. W terminalu kontenera należy zainicjalizować baze z szablonu za pomocą komendy:
-
-    # sqlite3 data/mydb.sqlite < init.sql
-
-  6. Aby połączyć się z terminalem sqlite i przeglądać bazę lub ją modyfikować należy wykonac polecenie:
-
-    # sqlite3 data/mydb.sqlite
-
-    # .quit (wyjscie z terminala sqlite)
-
   7. Można bazę podglądać też w VSC za pomocą rozszerzenia SQLite Viewer
 
   8. Wpisanie komendy:

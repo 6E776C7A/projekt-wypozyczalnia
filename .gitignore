@@ -1,7 +1,6 @@
 
 /vendor/
 node_modules/
-data/*.sqlite
 
 
 .DS_Store
@@ -17,11 +16,6 @@ Thumbs.db
 /logs/
 /cache/
 /tmp/
-
-
-*.sqlite
-*.sqlite3
-
 
 .vscode/
 .idea/

@@ -1,0 +1,23 @@
+{% if status %}
+    <div class="container mt-3">
+        {% if status == 'added' %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                Samochód został pomyślnie dodany!
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% elseif status == 'deleted' %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                Samochód został pomyślnie usunięty!
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% elseif status == 'error' %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                Wystąpił błąd podczas dodawania samochodu. Sprawdź czy wszystkie pola są wypełnione poprawnie.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endif %}
+    </div>
+{% endif %}

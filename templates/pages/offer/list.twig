@@ -1,0 +1,68 @@
+{% extends 'layouts/base.twig' %}
+
+{% block title %}Wszystkie pojazdy | {{ parent() }}{% endblock %}
+
+{% block content %}
+    <section class="py-5 min-vh-100">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h1 class="display-4 fw-bold text-primary mb-3">Dostępne pojazdy</h1>
+                <div class="mb-3">
+                    <a href="/reset-dates" class="btn btn-danger">
+                        <i class="bi bi-calendar-x me-2"></i>Zmień termin
+                    </a>
+                </div>
+                {% if dates.from and dates.to %}
+                    <p class="lead text-muted">Termin: <strong>{{ dates.from }}</strong> — <strong>{{ dates.to }}</strong></p>
+                {% endif %}
+            </div>
+
+            <div class="card shadow-sm border-0 mb-5">
+                <div class="card-body p-4">
+                    {% include 'partials/offer/_filters.twig' %}
+                </div>
+            </div>
+
+            {% set f = filters|default({}) %}
+
+            {% if hasFilters %}
+                <div class="card bg-light border-0 mb-4">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center gap-3 flex-wrap">
+                            <strong class="text-muted">Aktywne filtry:</strong>
+                            {% if f.category %}<span class="badge bg-primary">{{ f.category }}</span>{% endif %}
+                            {% if f.transmission %}<span class="badge bg-secondary">{{ f.transmission }}</span>{% endif %}
+                            {% if f.make %}<span class="badge bg-info">{{ f.make }}</span>{% endif %}
+                            {% if f.model %}<span class="badge bg-success">{{ f.model }}</span>{% endif %}
+                            {% if f.seats %}<span class="badge bg-warning text-dark">{{ f.seats }}</span>{% endif %}
+                            {% if f.max_price %}<span class="badge bg-danger">{{ f.max_price }}</span>{% endif %}
+                            {% if f.sort and f.sort != 'price_asc' %}<span class="badge bg-dark">Sort: Najpierw droższe</span>{% endif %}
+
+                            <a href="/offers" class="btn btn-outline-danger btn-sm ms-auto">
+                                <i class="bi bi-x-circle me-1"></i>Wyczyść filtry
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if cars is empty %}
+                <div class="text-center py-5">
+                    <div class="alert alert-warning border-0" role="alert">
+                        <i class="bi bi-exclamation-triangle display-4 text-warning d-block mb-3"></i>
+                        <h4 class="alert-heading">Brak dostępnych pojazdów</h4>
+                        <p class="mb-0">W wybranym terminie nie ma dostępnych pojazdów spełniających kryteria wyszukiwania.</p>
+                    </div>
+                </div>
+            {% else %}
+                <div class="row g-4">
+                    {% for car in cars %}
+                        <div class="col-md-6 col-lg-4">
+                            {% include 'partials/offer/_card.twig' with { car: car, dates: dates } %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}

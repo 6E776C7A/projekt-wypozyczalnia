@@ -1,0 +1,53 @@
+<div class="card h-100 shadow-sm border-0 h-100">
+    {% if car.image_url %}
+        <img src="{{ car.image_url }}" alt="{{ car.make }} {{ car.model }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+    {% else %}
+        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+            <div class="text-muted text-center">
+                <i class="bi bi-image display-6"></i>
+                <p class="mt-2 mb-0">Brak zdjęcia</p>
+            </div>
+        </div>
+    {% endif %}
+    
+    <div class="card-body d-flex flex-column">
+        <h5 class="card-title fw-bold mb-3">{{ car.make }} {{ car.model }}</h5>
+        
+        <div class="mb-3">
+            <span class="badge bg-primary me-2">{{ car.category }}</span>
+            <span class="badge bg-secondary">{{ car.transmission }}</span>
+        </div>
+        
+        <div class="mb-3">
+            <p class="text-muted mb-0">
+                <i class="bi bi-people me-1"></i>{{ car.seats }} miejsc
+            </p>
+        </div>
+        
+        <div class="row g-2 mb-3">
+            <div class="col-6">
+                <div class="text-center p-2 bg-light rounded">
+                    <p class="small text-muted mb-1">Dzień roboczy</p>
+                    <p class="fw-bold text-success mb-0">{{ car.workday_price|number_format(2, ',', ' ') }} zł</p>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="text-center p-2 bg-light rounded">
+                    <p class="small text-muted mb-1">Weekend</p>
+                    <p class="fw-bold text-primary mb-0">{{ car.weekend_price|number_format(2, ',', ' ') }} zł</p>
+                </div>
+            </div>
+        </div>
+
+        {% if car.total_price is defined %}
+            <div class="alert alert-info border-0 text-center mb-3">
+                <p class="small text-muted mb-1 ">Cena za cały termin:</p>
+                <p class="fw-bold mb-0">{{ car.total_price|number_format(2, ',', ' ') }} zł</p>
+            </div>
+        {% endif %}
+        
+        <a href="/offers/{{ car.id }}?from={{ dates.from }}&to={{ dates.to }}" class="btn btn-primary mt-auto">
+            <i class="bi bi-eye me-2"></i>Zobacz szczegóły
+        </a>
+    </div>
+</div>

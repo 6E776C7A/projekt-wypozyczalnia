@@ -1,0 +1,41 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}Logowanie administratora - Leasing Pro{% endblock %}
+
+{% block content %}
+<div class="container py-5 min-vh-100 d-flex align-items-center justify-content-center">
+    <div class="row justify-content-center w-100">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-5">
+                    <h1 class="text-center mb-4">Panel Administratora</h1>
+                    {% if login_error %}
+                        <div class="alert alert-danger" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            {{ login_error }}
+                        </div>
+                    {% endif %}
+                    <form method="POST" action="/admin/login">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Nazwa użytkownika</label>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Nazwa użytkownika" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Hasło</label>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Hasło" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Zaloguj się</button>
+                    </form>
+                    <div class="text-center mt-4 pt-3 border-top">
+                        <p class="text-muted small mb-2">Dane logowania:</p>
+                        <p class="fw-bold mb-0">Login: <code>admin</code> | Hasło: <code>admin123</code></p>
+                        <a href="/" class="btn btn-link text-decoration-none mt-3">
+                            <i class="bi bi-arrow-left me-2"></i>Wróć do strony głównej
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
