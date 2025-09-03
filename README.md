@@ -11,13 +11,9 @@ Posiadanie zainstalowanego DockerDesktop.
 
     # docker-compose up -d --build (inicjalizacja kontenera na Docker)
 
-  2. Następnie komenda:
+  2. Zmiany zarówno w VSC i w kontenerze zmiany się zapisują się lokalnie i w kontenerze.
 
-    # docker-compose exec app composer install (tworzy ona composer w kontenerze, wykonujemy tylko raz)
-
-  3. Zmiany zarówno w VSC i w kontenerze zmiany się zapisują się lokalnie i w kontenerze.
-
-  4. Aby połączyć się z kontenerem należy wykonać komendę:
+  3. Aby połączyć się z kontenerem należy wykonać komendę:
 
     # docker-compose exec app bash
 
