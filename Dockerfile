@@ -18,7 +18,7 @@ WORKDIR /var/www/html
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+COPY docker-startup.sh /usr/local/bin/docker-startup.sh
+ENTRYPOINT ["/usr/local/bin/docker-startup.sh"]
 
 CMD ["apache2-foreground"]
