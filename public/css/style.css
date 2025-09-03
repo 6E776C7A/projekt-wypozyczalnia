@@ -1,4 +1,3 @@
-/* Custom Bootstrap overrides and enhancements */
 :root {
     --bs-primary: #667eea;
     --bs-primary-rgb: 102, 126, 234;
@@ -7,7 +6,6 @@
     --bs-red: rgb(255, 0, 0);
 }
 
-/* Custom background gradient for body */
 body {
     background: linear-gradient(135deg, #eef1ff 0%, #f8f9ff 50%, #ffffff 100%);
     background-attachment: fixed;
@@ -18,13 +16,11 @@ body {
     flex-direction: column;
 }
 
-/* Ensure main content takes full height */
 main {
     flex: 1 0 auto;
-    min-height: calc(100vh - 200px); /* Adjust based on header/footer height */
+    min-height: calc(100vh - 200px); 
 }
 
-/* Enhanced card shadows */
 .card {
     transition: all 0.3s ease;
 }
@@ -34,7 +30,6 @@ main {
     box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
 }
 
-/* Custom button styles */
 .btn-primary {
     background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-secondary) 100%);
     border: none;
@@ -59,14 +54,12 @@ main {
     box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
 }
 
-/* Enhanced form controls */
 .form-control:focus,
 .form-select:focus {
     border-color: var(--bs-primary);
     box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
 }
 
-/* Custom navbar styling */
 .navbar-dark {
     background: linear-gradient(135deg, #333 0%, #555 100%) !important;
 }
@@ -76,13 +69,11 @@ main {
     letter-spacing: 0.5px;
 }
 
-/* Enhanced badges */
 .badge {
     font-weight: 500;
     letter-spacing: 0.3px;
 }
 
-/* Custom alert styling */
 .alert {
     border: none;
     border-radius: 12px;
@@ -108,7 +99,6 @@ main {
     color: #0c5460;
 }
 
-/* Enhanced price display */
 .text-success {
     color: #28a745 !important;
 }
@@ -121,14 +111,12 @@ main {
     color: var(--bs-red) !important;
 }
 
-/* Custom footer styling */
 footer {
     background: linear-gradient(135deg, #333 0%, #555 100%) !important;
     margin-top: auto !important;
     flex-shrink: 0;
 }
 
-/* Responsive image handling */
 .card-img-top {
     transition: transform 0.3s ease;
 }
@@ -137,7 +125,6 @@ footer {
     transform: scale(1.05);
 }
 
-/* Enhanced spacing for mobile */
 @media (max-width: 768px) {
     .container {
         padding-left: 1rem;
@@ -148,18 +135,15 @@ footer {
         padding: 1.25rem;
     }
     
-    /* Ensure mobile pages also fill full height */
     main {
         min-height: calc(100vh - 150px);
     }
 }
 
-/* Custom reCAPTCHA styling */
 .g-recaptcha {
     margin: 0 auto;
 }
 
-/* Enhanced typography */
 .display-4 {
     font-weight: 700;
 }
@@ -172,7 +156,6 @@ footer {
     font-weight: 700 !important;
 }
 
-/* Custom card borders */
 .card {
     border-radius: 15px;
     overflow: hidden;
@@ -183,19 +166,16 @@ footer {
     transform: none !important;
 }
 
-/* Enhanced button groups */
 .btn-group .btn {
     border-radius: 8px;
 }
 
-/* Custom form layout */
 .form-label {
     font-weight: 600;
     color: #495057;
     margin-bottom: 0.5rem;
 }
 
-/* Enhanced navigation */
 .nav-link {
     transition: all 0.2s ease;
 }
@@ -204,7 +184,6 @@ footer {
     transform: translateY(-1px);
 }
 
-/* Custom shadows */
 .shadow-sm {
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
 }
@@ -217,12 +196,10 @@ footer {
     box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important;
 }
 
-/* Enhanced grid system */
 .row.g-4 > * {
     padding: 0.75rem;
 }
 
-/* Custom button sizes */
 .btn-lg {
     padding: 0.75rem 1.5rem;
     font-size: 1.1rem;
@@ -235,7 +212,6 @@ footer {
     border-radius: 6px;
 }
 
-/* Enhanced form validation */
 .was-validated .form-control:valid,
 .form-control.is-valid {
     border-color: #28a745;
@@ -248,51 +224,42 @@ footer {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%23dc3545' viewBox='-2 -2 7 7'%3e%3cpath stroke='%23dc3545' d='M0 0l3 3m0-3L0 3'/%3e%3ccircle r='.5'/%3e%3ccircle cx='3' r='.5'/%3e%3ccircle cy='3' r='.5'/%3e%3ccircle cx='3' cy='3' r='.5'/%3e%3c/svg%3E");
 }
 
-/* Full height sections */
 .min-vh-100 {
     min-height: 100vh !important;
 }
 
-/* Ensure no white spaces */
 html, body {
     overflow-x: hidden;
     height: 100%;
 }
 
-/* Hero section improvements */
 .bg-primary {
     background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-secondary) 100%) !important;
     background-color: unset !important;
 }
 
-/* Card improvements for hero section */
 .card.shadow-lg {
     backdrop-filter: blur(10px);
     background: rgba(255, 255, 255, 0.95);
 }
 
-/* Additional footer positioning */
 .site-footer {
     margin-top: auto !important;
 }
 
-/* Ensure content fills available space */
 .flex-grow-1 {
     flex-grow: 1 !important;
 }
 
-/* Remove any default margins that might cause white spaces */
 * {
     box-sizing: border-box;
 }
 
-/* Ensure sections take full height */
 section.min-vh-100 {
     display: flex;
     align-items: center;
 }
 
-/* Container improvements */
 .container.min-vh-100 {
     display: flex;
     align-items: center;

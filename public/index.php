@@ -38,11 +38,10 @@ $requestMethod = $_SERVER['REQUEST_METHOD'];
 
 /**
  * Prosta funkcja logowania administratora.
- * Zmień dane logowania na własne!
  */
 function login(string $username, string $password): bool
 {
-    // Przykładowe dane logowania (zmień na własne w produkcji!)
+    //Dane logowania.
     $adminUser = 'admin';
     $adminPass = 'admin123';
 
